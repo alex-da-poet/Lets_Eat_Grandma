@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add a recipe · Let's eat grandma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Reenie+Beanie&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fffef8;
+    --paper-back: #f6e7c1;
+    --wood-dark: #5e3a1f;
+    --brass: #c9a24a;
+    --brass-dark: #7a5a14;
+    --ink: #26323f;
+    --stitch: #b9501a;
+    --display: "Chonburi", Georgia, serif;
+    --hand: "Reenie Beanie", "Segoe Print", cursive;
+    --type: "Special Elite", "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  html {
+    --side: 84px;
+    --inner: 30px;
+    min-height: 100%;
+    background-color: #d9601f;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23d9601f'/%3E%3Crect x='0' y='0' width='20' height='20' fill='%23e07030' opacity='.3'/%3E%3Crect x='20' y='20' width='20' height='20' fill='%23e07030' opacity='.3'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+  @media (max-width: 640px) { html { --side: 32px; --inner: 18px; } }
+  body {
+    color: var(--ink);
+    font-family: var(--type);
+    display: flex; flex-direction: column; align-items: center;
+    margin: var(--side);
+    min-height: calc(100vh - 2 * var(--side));
+    border: var(--inner) solid #f0903f;
+    border-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MCIgaGVpZ2h0PSI5MCIgdmlld0JveD0iMCAwIDkwIDkwIj48cmVjdCB3aWR0aD0iOTAiIGhlaWdodD0iOTAiIGZpbGw9IiNmMDkwM2YiLz48cGF0aCBkPSJNMCAwTDMwIDMwTTMwIDBMMCAzME0wIDMwTDMwIDYwTTMwIDMwTDAgNjBNMCA2MEwzMCA5ME0zMCA2MEwwIDkwTTMwIDBMNjAgMzBNNjAgMEwzMCAzME0zMCAzMEw2MCA2ME02MCAzMEwzMCA2ME0zMCA2MEw2MCA5ME02MCA2MEwzMCA5ME02MCAwTDkwIDMwTTkwIDBMNjAgMzBNNjAgMzBMOTAgNjBNOTAgMzBMNjAgNjBNNjAgNjBMOTAgOTBNOTAgNjBMNjAgOTAiIHN0cm9rZT0iI2ZmZjRlMCIgc3Ryb2tlLXdpZHRoPSIxLjQiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utb3BhY2l0eT0iLjg1IiBmaWxsPSJub25lIi8+PHJlY3QgeD0iMS41IiB5PSIxLjUiIHdpZHRoPSI4NyIgaGVpZ2h0PSI4NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2EzNTEwIiBzdHJva2Utb3BhY2l0eT0iLjYiIHN0cm9rZS13aWR0aD0iMyIvPjxyZWN0IHg9IjI4LjUiIHk9IjI4LjUiIHdpZHRoPSIzMyIgaGVpZ2h0PSIzMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2EzNTEwIiBzdHJva2Utb3BhY2l0eT0iLjYiIHN0cm9rZS13aWR0aD0iMyIvPjwvc3ZnPg==") 30 round;
+    padding: clamp(18px, 3vw, 34px) clamp(12px, 3vw, 28px) 40px;
+    gap: 0;
+  }
+  .patch {
+    background: var(--paper);
+    border: 2px dashed var(--stitch);
+    outline: 4px solid var(--paper);
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(60,20,0,.3);
+  }
+
+  /* NAV */
+  .nav {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+    gap: 6px 10px; padding: 8px 14px; margin: 0 auto 30px; width: fit-content; max-width: 100%;
+  }
+  .nav a { font: 1rem var(--type); color: #4a1410; text-decoration: none; padding: 8px 18px; border-radius: 999px; }
+  .nav a:hover, .nav a[aria-current="page"] { text-decoration: underline solid var(--stitch) 2px; text-underline-offset: 5px; }
+  .nav a.cta { background: #5e3a1f; color: #fff; box-shadow: 0 3px 0 #2e1a0a; }
+  .nav a.cta:hover, .nav a[aria-current="page"].cta { background: #7d4f2d; text-decoration: none; }
+
+  /* HEADER */
+  header { text-align: center; margin-bottom: 34px; padding: 16px 28px; }
+  h1 { font: 400 clamp(1.8rem, 6vw, 3rem)/1.05 var(--display); margin: 0 0 8px; color: #4a1410; }
+  header p { margin: 0; font-size: 1.05rem; }
+
+  /* MAIN LAYOUT */
+  .main-wrap { width: min(780px, 100%); display: flex; flex-direction: column; gap: 28px; }
+
+  /* ── STEP 1: DROP ZONE ── */
+  .step { padding: 24px 28px; }
+  .step-label {
+    display: flex; align-items: center; gap: 10px;
+    font: 0.8rem var(--type); color: var(--stitch); text-transform: uppercase; letter-spacing: .08em;
+    margin: 0 0 14px;
+  }
+  .step-label span {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--stitch); color: #fff; font-size: .75rem; flex-shrink: 0;
+  }
+
+  .dropzone {
+    border: 3px dashed var(--brass);
+    border-radius: 12px;
+    background: #fffbf0;
+    padding: 40px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+    position: relative;
+    min-height: 180px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  }
+  .dropzone:hover, .dropzone.over { background: #fff7dc; border-color: var(--stitch); }
+  .dropzone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .dropzone svg { color: var(--brass); width: 48px; height: 48px; }
+  .dropzone p { margin: 0; font-size: 1rem; }
+  .dropzone small { color: #7a6040; font-size: .82rem; }
+
+  /* two side-by-side card slots (front / back) */
+  .card-sides { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 560px) { .card-sides { grid-template-columns: 1fr; } }
+  .card-side { display: flex; flex-direction: column; gap: 10px; }
+  .side-title { margin: 0; font: 0.8rem var(--type); color: var(--stitch); text-transform: uppercase; letter-spacing: .08em; }
+  .card-side .dropzone { min-height: 150px; padding: 26px 18px; }
+  .card-side .dropzone svg { width: 36px; height: 36px; }
+
+  /* preview strip */
+  .preview-wrap { display: none; flex-direction: column; align-items: center; gap: 14px; }
+  .preview-wrap.visible { display: flex; }
+  .preview-img {
+    max-width: 100%; max-height: 300px; border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.25); object-fit: contain;
+  }
+  .change-btn {
+    font: .85rem var(--type); background: none; border: 2px solid var(--stitch);
+    color: var(--stitch); border-radius: 999px; padding: 6px 16px; cursor: pointer;
+  }
+  .change-btn:hover { background: var(--stitch); color: #fff; }
+
+  /* ── STEP 2: SCAN BUTTON ── */
+  .scan-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .scan-btn {
+    font: 1rem var(--type); color: #fff; background: #5e3a1f;
+    border: 0; border-radius: 999px; padding: 12px 28px; cursor: pointer;
+    box-shadow: 0 3px 0 #2e1a0a; display: flex; align-items: center; gap: 8px;
+  }
+  .scan-btn:hover { background: #7d4f2d; }
+  .scan-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #2e1a0a; }
+  .scan-btn:disabled { background: #9a7a60; cursor: not-allowed; box-shadow: none; }
+  .scan-btn svg { width: 20px; height: 20px; animation: none; flex-shrink: 0; }
+  .scan-btn.scanning svg { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .scan-status { font-size: .9rem; color: #5e3a1f; min-height: 1.4em; }
+  .scan-status.error { color: #c0392b; }
+  .scan-status.ok { color: #2d6a2d; }
+
+  /* API key note */
+  .api-note {
+    font-size: .82rem; color: #7a5020; background: #fff7dc;
+    border: 1px solid var(--brass); border-radius: 8px; padding: 10px 14px;
+    margin-top: 10px;
+  }
+  .api-note code { background: #f3e8c8; padding: 1px 5px; border-radius: 3px; font-family: monospace; }
+
+  /* ── STEP 3: FORM ── */
+  .recipe-form { display: none; flex-direction: column; gap: 20px; }
+  .recipe-form.visible { display: flex; }
+
+  fieldset { border: 0; margin: 0; padding: 0; }
+  legend {
+    font: 400 1.1rem/1 var(--display); color: #4a1410;
+    padding: 0 0 10px; width: 100%;
+    border-bottom: 2px dashed var(--brass); margin-bottom: 16px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; color: #5e3a1f; }
+  .field input, .field textarea, .field select {
+    font: 1rem var(--type); color: var(--ink);
+    background: var(--paper); border: 2px solid #c9a24a;
+    border-radius: 6px; padding: 9px 12px;
+    width: 100%; resize: vertical;
+    transition: border-color .2s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none; border-color: var(--stitch);
+  }
+  .field textarea { min-height: 90px; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 500px) { .field-row { grid-template-columns: 1fr; } }
+
+  .ingredients-list { display: flex; flex-direction: column; gap: 14px; }
+  .ingredient-row-wrap { display: flex; flex-direction: column; gap: 3px; }
+  .ingredient-row { display: flex; gap: 8px; align-items: center; }
+  .ingredient-row input { flex: 1; }
+  .ing-original { font-size: .78rem; color: #9a7050; padding-left: 2px; font-style: italic; }
+  .ing-note { font-size: .78rem; color: #2d6a2d; padding-left: 2px; }
+  .remove-btn {
+    background: none; border: none; cursor: pointer; color: #c0392b; font-size: 1.2rem;
+    padding: 4px 6px; border-radius: 4px; line-height: 1;
+    flex-shrink: 0;
+  }
+  .remove-btn:hover { background: #fdecea; }
+  .add-ingredient-btn {
+    align-self: flex-start; font: .88rem var(--type); background: none;
+    border: 2px dashed var(--brass); color: #5e3a1f; border-radius: 6px;
+    padding: 7px 14px; cursor: pointer;
+  }
+  .add-ingredient-btn:hover { background: #fff7dc; }
+
+  .steps-list { display: flex; flex-direction: column; gap: 10px; counter-reset: steps; }
+  .step-row { display: flex; gap: 10px; align-items: flex-start; }
+  .step-row::before {
+    counter-increment: steps;
+    content: counter(steps);
+    min-width: 26px; height: 26px; background: var(--brass); color: #3b2a10;
+    border-radius: 50%; font-size: .8rem; display: flex; align-items: center; justify-content: center;
+    margin-top: 10px; flex-shrink: 0;
+  }
+  .step-row textarea { flex: 1; min-height: 60px; }
+
+  /* handwritten preview card */
+  .card-preview {
+    background: var(--paper); border-radius: 8px;
+    padding: 20px 24px;
+    box-shadow: inset 0 0 0 1px #e8d8b0, 0 3px 8px rgba(0,0,0,.1);
+    font-family: var(--hand); font-size: 1.1rem; line-height: 1.6; color: var(--ink);
+  }
+  .card-preview h3 { font: 400 2rem/1 var(--hand); margin: 0 0 6px; color: #4a1410; }
+  .card-preview .card-meta { font-size: .95rem; color: #7a5020; margin-bottom: 12px; }
+
+  /* submit */
+  .submit-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .submit-btn {
+    font: 1.05rem var(--type); color: #fff; background: var(--stitch);
+    border: 0; border-radius: 999px; padding: 13px 32px; cursor: pointer;
+    box-shadow: 0 3px 0 #7a2a0a;
+  }
+  .submit-btn:hover { background: #d06020; }
+  .submit-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #7a2a0a; }
+  .submit-note { font-size: .85rem; color: #7a5020; }
+
+  /* success */
+  .success-msg {
+    display: none; text-align: center; padding: 32px 24px;
+    flex-direction: column; align-items: center; gap: 14px;
+  }
+  .success-msg.visible { display: flex; }
+  .success-msg svg { color: #2d6a2d; width: 56px; height: 56px; }
+  .success-msg h2 { font: 400 1.8rem/1 var(--display); color: #4a1410; margin: 0; }
+  .success-msg p { margin: 0; font-size: 1rem; }
+  .success-msg a { color: var(--stitch); }
+
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+
+<nav class="nav patch" aria-label="Main">
+  <a href="index.html">Home</a>
+  <a href="recipes.html">Recipes</a>
+  <a href="/map">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" style="vertical-align:-.15em;margin-right:5px"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Map
+  </a>
+  <a href="submit.html" class="cta" aria-current="page">Add a recipe</a>
+</nav>
+
+<header class="patch">
+  <h1>Add grandma's recipe</h1>
+  <p>Drop in a photo of her recipe card and we'll read it for you.</p>
+</header>
+
+<div class="main-wrap">
+
+  <!-- ── STEP 1 ── -->
+  <div class="step patch" id="step1">
+    <p class="step-label"><span>1</span> Add a photo of the recipe card — and the back too, if it has one</p>
+
+    <div class="card-sides">
+      <!-- FRONT -->
+      <div class="card-side">
+        <p class="side-title">Front <span style="color:var(--stitch)">*</span></p>
+        <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload the front of the recipe card">
+          <input type="file" id="fileInput" accept="image/*" aria-label="Choose front image file">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <p>Drag &amp; drop, or <strong>click to browse</strong></p>
+          <small>JPG, PNG, WEBP, HEIC · max 10 MB</small>
+        </div>
+        <div class="preview-wrap" id="previewWrap">
+          <img id="previewImg" class="preview-img" src="" alt="Front of your recipe card">
+          <button class="change-btn" id="changeBtn" type="button">⟳ Change</button>
+        </div>
+      </div>
+
+      <!-- BACK (optional) -->
+      <div class="card-side">
+        <p class="side-title">Back <span style="color:#9a7050;font-weight:normal">(optional)</span></p>
+        <div class="dropzone" id="dropzoneBack" role="button" tabindex="0" aria-label="Upload the back of the recipe card">
+          <input type="file" id="fileInputBack" accept="image/*" aria-label="Choose back image file">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <p>Drag &amp; drop, or <strong>click to browse</strong></p>
+          <small>If the method is on the back</small>
+        </div>
+        <div class="preview-wrap" id="previewWrapBack">
+          <img id="previewImgBack" class="preview-img" src="" alt="Back of your recipe card">
+          <button class="change-btn" id="changeBtnBack" type="button">⟳ Change</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2 ── -->
+  <div class="step patch" id="step2">
+    <p class="step-label"><span>2</span> Let the AI read the recipe</p>
+
+    <div class="api-note">
+      <strong>How it works:</strong> your photo is sent to our server, which uses an AI vision model to
+      read the card — even if it's handwritten. It then <strong>converts vague measures</strong>
+      like <em>a pinch</em>, <em>a knob of butter</em>, or <em>a bag of flour</em> into universal
+      amounts (both metric and US), so anyone can follow grandma's recipe.
+      <div style="margin-top:6px;font-size:.78rem;color:#9a6030;">
+        Nothing is stored — the image is read once and discarded. No sign-in or API key needed.
+      </div>
+    </div>
+
+    <div class="scan-row" style="margin-top:18px;">
+      <button class="scan-btn" id="scanBtn" type="button" disabled>
+        <svg id="scanIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 2a10 10 0 1 0 10 10"/>
+          <path d="M22 2l-10 10"/>
+        </svg>
+        Read recipe
+      </button>
+      <span class="scan-status" id="scanStatus" aria-live="polite"></span>
+    </div>
+
+    <p style="margin:14px 0 0;font-size:.85rem;color:#7a5020;">
+      Or <button type="button" id="skipScan" style="background:none;border:none;cursor:pointer;text-decoration:underline;color:var(--stitch);font:inherit;padding:0;">skip this step</button> and fill in the form yourself.
+    </p>
+  </div>
+
+  <!-- ── STEP 3 ── -->
+  <div class="step patch" id="step3">
+    <p class="step-label"><span>3</span> Check, edit, and submit</p>
+
+    <div class="recipe-form" id="recipeForm">
+      <fieldset>
+        <legend>About the recipe</legend>
+        <div class="field-row">
+          <div class="field">
+            <label for="fTitle">Recipe name *</label>
+            <input type="text" id="fTitle" name="title" required placeholder="e.g. Sunday Meatballs">
+          </div>
+          <div class="field">
+            <label for="fGrandma">Grandma's name *</label>
+            <input type="text" id="fGrandma" name="grandma" required placeholder="e.g. Nana Rose">
+          </div>
+        </div>
+        <div class="field-row" style="margin-top:14px;">
+          <div class="field">
+            <label for="fBy">Submitted by *</label>
+            <input type="text" id="fBy" name="by" required placeholder="Your name">
+          </div>
+          <div class="field">
+            <label for="fTime">Cook time</label>
+            <input type="text" id="fTime" name="time" placeholder="e.g. 1 hr 30 min">
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label for="fBlurb">One-line description</label>
+          <input type="text" id="fBlurb" name="blurb" placeholder="What makes this dish special?">
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label for="fServings">Serves</label>
+          <input type="text" id="fServings" name="servings" placeholder="e.g. 4–6">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>About grandma</legend>
+        <div class="field">
+          <label for="fFrom">Where is she from?</label>
+          <input type="text" id="fFrom" name="from" placeholder="e.g. Bensonhurst, Brooklyn">
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label for="fGrandmaDesc">Tell us about her</label>
+          <textarea id="fGrandmaDesc" name="grandmaDescription" placeholder="What was she like? What made her cooking special?"></textarea>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label>A photo of grandma</label>
+          <div class="dropzone" id="grandmaDrop" role="button" tabindex="0" aria-label="Upload a photo of grandma" style="min-height:140px;padding:26px 20px;">
+            <input type="file" id="grandmaFileInput" accept="image/*" aria-label="Choose grandma photo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:36px;height:36px;">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <path d="M21 15l-5-5L5 21"/>
+            </svg>
+            <p style="font-size:.95rem;">Drop a photo here, or <strong>click to browse</strong></p>
+            <small>This appears in the photo spot on the recipe page.</small>
+          </div>
+          <div class="preview-wrap" id="grandmaPreviewWrap" style="margin-top:12px;">
+            <img id="grandmaPreviewImg" class="preview-img" src="" alt="Grandma preview" style="max-height:200px;">
+            <button class="change-btn" id="grandmaChangeBtn" type="button">⟳ Choose a different photo</button>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Ingredients</legend>
+        <div class="ingredients-list" id="ingredientsList">
+          <!-- rows injected by JS -->
+        </div>
+        <button type="button" class="add-ingredient-btn" id="addIngredient">+ Add ingredient</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Method</legend>
+        <div class="steps-list" id="stepsList">
+          <!-- rows injected by JS -->
+        </div>
+        <button type="button" class="add-ingredient-btn" id="addStep">+ Add step</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Notes &amp; tips</legend>
+        <div class="field">
+          <label for="fNotes">Grandma's notes</label>
+          <textarea id="fNotes" name="notes" placeholder="Any extra tips, substitutions, or family secrets…"></textarea>
+        </div>
+      </fieldset>
+
+      <!-- live handwritten preview -->
+      <fieldset>
+        <legend>Preview card</legend>
+        <div class="card-preview" id="cardPreview" aria-live="polite">
+          <h3 id="pvTitle">Recipe name</h3>
+          <div class="card-meta" id="pvMeta"></div>
+          <div id="pvIngredients"></div>
+          <div id="pvSteps" style="margin-top:10px;"></div>
+          <div id="pvNotes" style="margin-top:10px;font-style:italic;font-size:.95rem;color:#7a5020;"></div>
+        </div>
+      </fieldset>
+
+      <div class="submit-row">
+        <button type="button" class="submit-btn" id="submitBtn">Add to the box 🍲</button>
+        <span class="submit-note">Your recipe will be reviewed before appearing on the site.</span>
+      </div>
+    </div>
+
+    <!-- empty state before scan or skip -->
+    <div id="step3Empty" style="color:#9a7050;font-size:.95rem;">
+      Complete step 2 (or skip it) to see the form here.
+    </div>
+
+    <!-- success -->
+    <div class="success-msg" id="successMsg">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M8 12l3 3 5-5"/>
+      </svg>
+      <h2>Recipe submitted!</h2>
+      <p>Thank you — grandma would be proud. 💛<br>We'll review it and add it to the box soon.</p>
+      <p><a href="/">← Back to the recipe box</a></p>
+    </div>
+  </div>
+
+</div><!-- /main-wrap -->
+
+<p class="sr" id="liveRegion" aria-live="polite"></p>
+
+<script>
+/* ──────────────────────────────────────────────
+   HELPERS
+────────────────────────────────────────────── */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let uploadedFile = null;       // front of the recipe card
+let uploadedDataURL = null;
+let backFile = null;           // optional back of the recipe card
+let backDataURL = null;
+let grandmaFile = null;        // optional photo of grandma for the recipe page
+
+/* ──────────────────────────────────────────────
+   Grandma photo picker (in the "About grandma" section)
+────────────────────────────────────────────── */
+function initGrandmaPhoto() {
+  const drop    = $('grandmaDrop');
+  const input   = $('grandmaFileInput');
+  const wrap     = $('grandmaPreviewWrap');
+  const img      = $('grandmaPreviewImg');
+  const changeBt = $('grandmaChangeBtn');
+  if (!drop) return;
+
+  function load(file) {
+    if (!file || !file.type.startsWith('image/')) {
+      alert('Please choose an image file for grandma\'s photo.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image is too large. Please use one under 10 MB.');
+      return;
+    }
+    grandmaFile = file;
+    const reader = new FileReader();
+    reader.onload = e => {
+      img.src = e.target.result;
+      drop.style.display = 'none';
+      wrap.classList.add('visible');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  input.addEventListener('change', e => load(e.target.files[0]));
+  changeBt.addEventListener('click', () => {
+    grandmaFile = null;
+    input.value = '';
+    wrap.classList.remove('visible');
+    drop.style.display = '';
+  });
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('over');
+    const file = e.dataTransfer.files[0];
+    if (file) load(file);
+  });
+  drop.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+  });
+}
+initGrandmaPhoto();
+
+/* ──────────────────────────────────────────────
+   STEP 1 – file upload / drop zone
+────────────────────────────────────────────── */
+const dropzone   = $('dropzone');
+const fileInput  = $('fileInput');
+const previewWrap= $('previewWrap');
+const previewImg = $('previewImg');
+const changeBtn  = $('changeBtn');
+const scanBtn    = $('scanBtn');
+
+function loadFile(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    alert('Please choose an image file (JPG, PNG, WEBP, etc.).');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    alert('Image is too large. Please use one under 10 MB.');
+    return;
+  }
+  uploadedFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    uploadedDataURL = e.target.result;
+    previewImg.src = uploadedDataURL;
+    dropzone.style.display = 'none';
+    previewWrap.classList.add('visible');
+    scanBtn.disabled = false;
+    $('scanStatus').textContent = '';
+    $('scanStatus').className = 'scan-status';
+    announce('Image loaded. Ready to scan.');
+  };
+  reader.readAsDataURL(file);
+}
+
+fileInput.addEventListener('change', e => loadFile(e.target.files[0]));
+changeBtn.addEventListener('click', () => {
+  uploadedFile = null; uploadedDataURL = null;
+  fileInput.value = '';
+  previewWrap.classList.remove('visible');
+  dropzone.style.display = '';
+  scanBtn.disabled = true;
+});
+
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('over'); });
+dropzone.addEventListener('dragleave',  () => dropzone.classList.remove('over'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault(); dropzone.classList.remove('over');
+  const file = e.dataTransfer.files[0];
+  if (file) loadFile(file);
+});
+dropzone.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+});
+
+/* Back of the card (optional) */
+const dropzoneBack   = $('dropzoneBack');
+const fileInputBack  = $('fileInputBack');
+const previewWrapBack= $('previewWrapBack');
+const previewImgBack = $('previewImgBack');
+const changeBtnBack  = $('changeBtnBack');
+
+function loadBackFile(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    alert('Please choose an image file (JPG, PNG, WEBP, etc.).');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    alert('Image is too large. Please use one under 10 MB.');
+    return;
+  }
+  backFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    backDataURL = e.target.result;
+    previewImgBack.src = backDataURL;
+    dropzoneBack.style.display = 'none';
+    previewWrapBack.classList.add('visible');
+    announce('Back of the card loaded.');
+  };
+  reader.readAsDataURL(file);
+}
+
+fileInputBack.addEventListener('change', e => loadBackFile(e.target.files[0]));
+changeBtnBack.addEventListener('click', () => {
+  backFile = null; backDataURL = null;
+  fileInputBack.value = '';
+  previewWrapBack.classList.remove('visible');
+  dropzoneBack.style.display = '';
+});
+dropzoneBack.addEventListener('dragover', e => { e.preventDefault(); dropzoneBack.classList.add('over'); });
+dropzoneBack.addEventListener('dragleave',  () => dropzoneBack.classList.remove('over'));
+dropzoneBack.addEventListener('drop', e => {
+  e.preventDefault(); dropzoneBack.classList.remove('over');
+  const file = e.dataTransfer.files[0];
+  if (file) loadBackFile(file);
+});
+dropzoneBack.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputBack.click(); }
+});
+
+/* ──────────────────────────────────────────────
+   STEP 2 – AI scan (via secure backend)
+   The server reads the image AND normalizes vague
+   measures, returning dual metric/US amounts.
+────────────────────────────────────────────── */
+const API_BASE = ''; // same origin; set to 'http://localhost:3000' if served separately
+
+scanBtn.addEventListener('click', async () => {
+  if (!uploadedFile && !uploadedDataURL) {
+    $('scanStatus').textContent = 'Please upload an image first.';
+    $('scanStatus').className = 'scan-status error';
+    return;
+  }
+
+  scanBtn.disabled = true;
+  scanBtn.classList.add('scanning');
+  $('scanStatus').textContent = 'Reading the recipe card and converting measures…';
+  $('scanStatus').className = 'scan-status';
+
+  try {
+    // Send the raw file(s) as multipart so the server handles the AI call.
+    // Front is required; back is optional (e.g. method on the reverse side).
+    const formData = new FormData();
+    if (uploadedFile) formData.append('image', uploadedFile);
+    else formData.append('dataUrl', uploadedDataURL);
+    if (backFile) formData.append('imageBack', backFile);
+    else if (backDataURL) formData.append('dataUrlBack', backDataURL);
+
+    const resp = await fetch(`${API_BASE}/api/read-recipe`, { method: 'POST', body: formData });
+    const data = await resp.json().catch(() => ({}));
+
+    if (!resp.ok) throw new Error(data?.error || `Server error ${resp.status}`);
+    if (!data.recipe) throw new Error('No recipe was returned. Try a clearer photo.');
+
+    populateForm(data.recipe);
+    scanBtn.classList.remove('scanning');
+    $('scanStatus').textContent = '✓ Recipe read and measures converted!';
+    $('scanStatus').className = 'scan-status ok';
+    showForm();
+    announce('Recipe extracted and measurements converted. Please review the form below.');
+
+  } catch (e) {
+    showScanError(e.message || 'Something went wrong. Please try again or fill in manually.');
+  }
+});
+
+function showScanError(msg) {
+  scanBtn.disabled = false;
+  scanBtn.classList.remove('scanning');
+  $('scanStatus').textContent = msg;
+  $('scanStatus').className = 'scan-status error';
+}
+
+$('skipScan').addEventListener('click', () => {
+  showForm();
+  announce('Form is now visible. Please fill in the recipe details.');
+});
+
+/* ──────────────────────────────────────────────
+   STEP 3 – form population & editing
+────────────────────────────────────────────── */
+function showForm() {
+  $('step3Empty').style.display = 'none';
+  const form = $('recipeForm');
+  form.classList.add('visible');
+  // Ensure at least one ingredient and step row
+  if ($('ingredientsList').children.length === 0) addIngredientRow('');
+  if ($('stepsList').children.length === 0) addStepRow('');
+  updatePreview();
+}
+
+function populateForm(r) {
+  $('fTitle').value    = r.title    ?? '';
+  $('fGrandma').value  = r.grandma  ?? '';
+  $('fTime').value     = r.time     ?? '';
+  $('fServings').value = r.servings ?? '';
+  $('fBlurb').value    = r.blurb    ?? '';
+  $('fNotes').value    = r.notes    ?? '';
+
+  const il = $('ingredientsList'); il.innerHTML = '';
+  (r.ingredients ?? []).forEach(i => addIngredientRow(i));
+  if (il.children.length === 0) addIngredientRow('');
+
+  const sl = $('stepsList'); sl.innerHTML = '';
+  (r.steps ?? []).forEach(s => addStepRow(s));
+  if (sl.children.length === 0) addStepRow('');
+}
+
+/**
+ * Accepts either:
+ *   - a plain string (manual entry / "+ Add ingredient")
+ *   - a rich object from the AI: { item, original, quantity, unit, metric, us, display, notes }
+ * The visible, editable field is the normalized universal line; the original
+ * card text and any conversion note are shown underneath for transparency.
+ */
+function addIngredientRow(val) {
+  const isObj = val && typeof val === 'object';
+  const editable = isObj ? (val.display || buildLine(val)) : (val || '');
+  const original = isObj ? (val.original || '') : '';
+  const noteText = isObj && Array.isArray(val.notes) ? val.notes.join(' · ') : '';
+
+  const row = document.createElement('div');
+  row.className = 'ingredient-row-wrap';
+  row.innerHTML = `
+    <div class="ingredient-row">
+      <input type="text" class="ingredient-input" placeholder="e.g. 60 g (≈ 1/4 cup) plain flour" value="${esc(editable)}">
+      <button type="button" class="remove-btn" aria-label="Remove ingredient">×</button>
+    </div>
+    ${original ? `<div class="ing-original">card said: “${esc(original)}”</div>` : ''}
+    ${noteText ? `<div class="ing-note">🔁 ${esc(noteText)}</div>` : ''}`;
+
+  row.querySelector('.remove-btn').addEventListener('click', () => { row.remove(); updatePreview(); });
+  row.querySelector('input').addEventListener('input', updatePreview);
+  $('ingredientsList').appendChild(row);
+  updatePreview();
+}
+
+/** Fallback display builder if the server didn't send one. */
+function buildLine(i) {
+  const name = i.item || '';
+  if (i.metric && i.us) return `${i.metric.value} ${i.metric.unit} (≈ ${i.us.value} ${i.us.unit}) ${name}`.trim();
+  if (i.quantity != null && i.unit && i.unit !== 'count') return `${i.quantity} ${i.unit} ${name}`.trim();
+  if (i.quantity != null) return `${i.quantity} ${name}`.trim();
+  return name;
+}
+
+function addStepRow(val) {
+  const row = document.createElement('div');
+  row.className = 'step-row';
+  row.innerHTML = `<textarea class="step-input" placeholder="Describe this step…">${esc(val)}</textarea>
+    <button type="button" class="remove-btn" aria-label="Remove step" style="margin-top:10px;">×</button>`;
+  row.querySelector('.remove-btn').addEventListener('click', () => { row.remove(); updatePreview(); });
+  row.querySelector('textarea').addEventListener('input', updatePreview);
+  $('stepsList').appendChild(row);
+  updatePreview();
+}
+
+$('addIngredient').addEventListener('click', () => addIngredientRow(''));
+$('addStep').addEventListener('click', () => addStepRow(''));
+
+// Live preview
+['fTitle','fGrandma','fBy','fTime','fServings','fBlurb','fNotes'].forEach(id => {
+  $(id)?.addEventListener('input', updatePreview);
+});
+
+function updatePreview() {
+  const title    = $('fTitle').value    || 'Recipe name';
+  const grandma  = $('fGrandma').value;
+  const by       = $('fBy').value;
+  const time     = $('fTime').value;
+  const servings = $('fServings').value;
+  const notes    = $('fNotes').value;
+
+  $('pvTitle').textContent = title;
+  const metaParts = [];
+  if (grandma) metaParts.push(`Grandma: ${grandma}`);
+  if (by)      metaParts.push(`by ${by}`);
+  if (time)    metaParts.push(time);
+  if (servings)metaParts.push(`Serves ${servings}`);
+  $('pvMeta').textContent = metaParts.join(' · ');
+
+  const ings = [...$('ingredientsList').querySelectorAll('.ingredient-input')]
+    .map(i => i.value.trim()).filter(Boolean);
+  $('pvIngredients').innerHTML = ings.length
+    ? `<ul style="margin:0;padding-left:1.2em;">${ings.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : '';
+
+  const stps = [...$('stepsList').querySelectorAll('.step-input')]
+    .map(t => t.value.trim()).filter(Boolean);
+  $('pvSteps').innerHTML = stps.length
+    ? `<ol style="margin:0;padding-left:1.2em;">${stps.map(s => `<li style="margin-bottom:4px;">${esc(s)}</li>`).join('')}</ol>` : '';
+
+  $('pvNotes').textContent = notes ? `📝 ${notes}` : '';
+}
+
+/* ──────────────────────────────────────────────
+   SUBMIT
+────────────────────────────────────────────── */
+$('submitBtn').addEventListener('click', async () => {
+  // Basic validation
+  const title   = $('fTitle').value.trim();
+  const grandma = $('fGrandma').value.trim();
+  const by      = $('fBy').value.trim();
+  if (!title || !grandma || !by) {
+    alert('Please fill in at least the recipe name, grandma\'s name, and your name.');
+    return;
+  }
+
+  // Collect data — ingredients/steps read straight from the (AI-prefilled,
+  // user-editable) fields, so whatever the cook confirms is what gets saved.
+  const payload = {
+    title, grandma, by,
+    from:               $('fFrom').value.trim(),
+    grandmaDescription: $('fGrandmaDesc').value.trim(),
+    time:     $('fTime').value.trim(),
+    servings: $('fServings').value.trim(),
+    blurb:    $('fBlurb').value.trim(),
+    notes:    $('fNotes').value.trim(),
+    ingredients: [...$('ingredientsList').querySelectorAll('.ingredient-input')].map(i=>i.value.trim()).filter(Boolean),
+    steps:       [...$('stepsList').querySelectorAll('.step-input')].map(t=>t.value.trim()).filter(Boolean)
+  };
+
+  const submitBtn = $('submitBtn');
+  const submitNote = document.querySelector('.submit-note');
+  const originalLabel = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Saving…';
+  if (submitNote) { submitNote.textContent = ''; submitNote.style.color = '#7a5020'; }
+
+  try {
+    // Send the recipe JSON plus the original photo (if any) to the backend.
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(payload));
+    if (uploadedFile) formData.append('image', uploadedFile);
+    if (backFile) formData.append('imageBack', backFile);
+    if (grandmaFile) formData.append('grandmaPhoto', grandmaFile);
+
+    const resp = await fetch(`${API_BASE}/api/recipes`, { method: 'POST', body: formData });
+    const result = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(result?.error || `Server error ${resp.status}`);
+
+    // Success — reveal the thank-you panel, with a link to the new page.
+    const url = result?.recipe?.url;
+    if (url) {
+      const msg = $('successMsg').querySelector('p');
+      if (msg) msg.innerHTML =
+        `Thank you — grandma would be proud. 💛<br><a href="${url}">View grandma's recipe page →</a>`;
+    }
+    $('recipeForm').classList.remove('visible');
+    $('successMsg').classList.add('visible');
+    announce('Recipe submitted successfully!');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  } catch (e) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalLabel;
+    if (submitNote) {
+      submitNote.textContent = (e.message || 'Could not save the recipe.') + ' Please try again.';
+      submitNote.style.color = '#c0392b';
+    }
+    announce('Submission failed: ' + (e.message || 'please try again.'));
+  }
+});
+
+/* ──────────────────────────────────────────────
+   ACCESSIBILITY – live region helper
+────────────────────────────────────────────── */
+function announce(msg) { $('liveRegion').textContent = ''; setTimeout(() => $('liveRegion').textContent = msg, 50); }
+</script>
+</body>
+</html>

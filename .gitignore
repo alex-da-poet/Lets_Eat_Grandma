@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Secrets — never commit your real API key
+.env
+**/.env
+
+# Runtime data (local recipe store + uploaded photos)
+src/server/data/
+
+# OS / editor cruft
+.DS_Store
+*.log
+
+# Stale/unused duplicates not part of the running app (app runs from src/server)
+bin/
+lib/

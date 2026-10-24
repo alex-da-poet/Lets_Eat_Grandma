@@ -1,0 +1,19 @@
+# Render deployment blueprint for "Let's eat grandma".
+# Render reads this automatically when you create a "Blueprint" from the repo.
+services:
+  - type: web
+    name: lets-eat-grandma
+    runtime: node
+    plan: free
+    # The app lives in src/server, so build and run from there.
+    rootDir: src/server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      # Set the actual value in the Render dashboard (do NOT hard-code the key).
+      - key: GEMINI_API_KEY
+        sync: false
+      # Hold submissions for review before they appear publicly. Recommended
+      # for a public site. Remove or set to false to publish immediately.
+      - key: REQUIRE_REVIEW
+        value: "true"
