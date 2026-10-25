@@ -204,7 +204,7 @@ function buildGrandmaPage(template, grandma) {
   })}\n  </main>`;
   return template
     .replace(/<main>[\s\S]*<\/main>/, main)
-    .replace(/<title>[\s\S]*?<\/title>/, `<title>Meet ${escapeHtml(grandma.name)} · Let's eat grandma</title>`)
+    .replace(/<title>[\s\S]*?<\/title>/, `<title>Meet ${escapeHtml(grandma.name)} · Let's eat grandma!</title>`)
     .replace(/href="index\.html"/g, 'href="/"')
     .replace(/href="submit\.html"/g, 'href="/submit"')
     .replace(/href="grandma-submit\.html"/g, 'href="/grandma-submit"');
@@ -219,7 +219,7 @@ function buildRecipePage(template, r) {
   let html = template.replace(/<main>[\s\S]*<\/main>/, main);
   html = html.replace(
     /<title>[\s\S]*?<\/title>/,
-    `<title>${escapeHtml(r.title)} · ${escapeHtml(r.grandma)} · Let's eat grandma</title>`
+    `<title>${escapeHtml(r.title)} · ${escapeHtml(r.grandma)} · Let's eat grandma!</title>`
   );
   // The recipe is served at /recipes/<slug>, so the template's RELATIVE nav
   // links (e.g. "index.html") would resolve to /recipes/index.html and 404.
