@@ -29,10 +29,15 @@
       align-items: center;
       margin: 0;
       padding: clamp(18px, 3vw, 34px) clamp(12px, 3vw, 28px) 40px;
-      border: 14px solid #c99a72;
-      background-color: #a66e4f;
-      background-image: radial-gradient(#fffdf71c 1px, transparent 1px);
-      background-size: 16px 16px;
+      border: 14px solid transparent;
+      background-color: #80563f;
+      background-image:
+        radial-gradient(#fffdf71c 1px, transparent 1px),
+        linear-gradient(#80563f, #80563f),
+        repeating-conic-gradient(#bc906e 0% 25%, #d6b99b 0% 50%);
+      background-position: 0 0, 0 0, 50%;
+      background-size: 16px 16px, auto, 28px 28px;
+      background-clip: padding-box, padding-box, border-box;
       color: var(--map-ink);
       font-family: var(--map-type);
     }
@@ -87,8 +92,8 @@
       max-width: 530px;
       margin: 0 auto;
       color: #fffdf7;
-      font-size: .9rem;
-      line-height: 1.6;
+      font-size: 1rem;
+      line-height: 1.65;
     }
     .map-page .map-layout {
       display: grid;
@@ -98,7 +103,7 @@
       border: 10px solid var(--map-wood);
       border-radius: 12px;
       background: var(--map-wood);
-      box-shadow: 0 14px 24px #3b210f66, inset 0 0 0 2px #b87a43;
+      box-shadow: 0 14px 24px #3b210f66, inset 0 0 0 2px var(--map-brass);
     }
     .map-page .world-map {
       position: relative;
@@ -262,17 +267,17 @@
       .map-page .map-detail-copy { min-height: 0; }
     }
     @media (max-width: 580px) {
-      body.map-page { padding: 14px 10px 24px; border-width: 8px; }
+      body.map-page { padding: 14px 10px 24px; border-width: 7px; }
       .map-page .map-header { margin-bottom: 20px; padding: 12px 15px; }
       .map-page .map-intro h2 { font-size: 2rem; }
       .map-page .map-layout { border-width: 6px; }
       .map-page .world-map { min-height: 265px; border-width: 4px; }
       .map-page .map-pin { width: 30px; height: 30px; }
-      .map-page .map-legend { bottom: 8px; left: 8px; padding: 6px 8px; font-size: .58rem; }
-      .map-page .map-legend small { font-size: .5rem; }
+      .map-page .map-legend { bottom: 8px; left: 8px; max-width: calc(100% - 16px); padding: 7px 9px; font-size: .75rem; line-height: 1.4; }
+      .map-page .map-legend small { font-size: .68rem; line-height: 1.4; }
       .map-page .map-detail { padding: 20px 17px; }
       .map-page .map-bottom { font-size: 1rem; }
-      .map-page .map-bottom .button { padding: 8px; font-size: .58rem; }
+      .map-page .map-bottom .button { padding: 9px; font-size: .75rem; }
       .map-page .site-footer { gap: 10px; }
     }
   </style>
@@ -326,7 +331,7 @@
         <div class="region-recipe hidden" data-region-card="South Korea"><span class="region-flag">🇰🇷</span><div><strong>Halmeoni Sun-hee</strong><span>New Year's mandu</span></div><a href="index.html#recipe-box" aria-label="See this recipe">↗</a></div>
         <div class="region-recipe hidden" id="submitted-region-recipe"><span class="region-flag" aria-hidden="true">✳</span><div><strong id="submitted-grandma-name"></strong><span id="submitted-grandma-category"></span></div></div>
         <p class="map-storage-message" id="map-submission-message" role="status" hidden></p>
-        <a class="text-link map-share" href="submit.html">Share a grandma to add her to the map <span aria-hidden="true">→</span></a>
+        <a class="text-link map-share" href="submit.html">Share a grandma and her recipe <span aria-hidden="true">→</span></a>
       </aside>
     </section>
     <section class="map-bottom"><span>From one family table to another.</span><a class="button button-outline" href="index.html#recipe-box">Browse all recipes <span aria-hidden="true">→</span></a></section>

@@ -23,14 +23,14 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   html {
-    --side: 84px;
-    --inner: 30px;
+    --side: clamp(10px, 3vw, 36px);
+    --inner: clamp(7px, 1.3vw, 14px);
     min-height: 100%;
     background-color: #80563f;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23d9601f'/%3E%3Crect x='0' y='0' width='20' height='20' fill='%23e07030' opacity='.3'/%3E%3Crect x='20' y='20' width='20' height='20' fill='%23e07030' opacity='.3'/%3E%3C/svg%3E");
     background-repeat: repeat;
   }
-  @media (max-width: 640px) { html { --side: 32px; --inner: 18px; } }
+  @media (max-width: 640px) { html { --side: 8px; --inner: 7px; } }
   body {
     color: var(--ink);
     font-family: var(--type);
@@ -143,7 +143,26 @@
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   @media screen {
     html { background-color: #80563f; background-image: radial-gradient(#fffdf71c 1px, transparent 1px); background-size: 16px 16px; }
-    body { border-image: none; border-color: #bc906e; }
+    body {
+      border-color: transparent;
+      border-image: none;
+      background:
+        radial-gradient(#fffdf71c 1px, transparent 1px) 0 0 / 16px 16px padding-box,
+        linear-gradient(#80563f, #80563f) padding-box,
+        repeating-conic-gradient(#bc906e 0% 25%, #d6b99b 0% 50%) 50% / 28px 28px border-box;
+    }
+  }
+  @media (max-width: 520px) {
+    .nav { gap: 4px; padding: 6px 8px; margin-bottom: 20px; }
+    .nav a { padding: 9px 10px; font-size: .95rem; }
+    header { margin-bottom: 22px; padding: 14px 16px; }
+    header p { font-size: 1rem; line-height: 1.5; }
+    .wrap { width: 100%; }
+    .toolbar { padding: 12px; }
+    .search { width: 100%; }
+    .scroll { max-height: none; padding: 12px; }
+    .grid { grid-template-columns: minmax(0, 1fr); }
+    .rcard { padding: 16px; }
   }
 </style>
 </head>
@@ -153,7 +172,7 @@
   <a href="index.html">Home</a>
   <a href="recipes.html" aria-current="page">Recipes</a>
   <a href="map.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Map</a>
-  <a href="submit.html" class="cta">Add a recipe</a>
+  <a href="submit.html" class="cta">Share a grandma</a>
 </nav>
 
 <header class="patch">

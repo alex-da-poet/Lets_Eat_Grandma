@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Add a recipe · Let's eat grandma</title>
+<title>Share a grandma &amp; her recipe · Let's eat grandma</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:wght@500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
@@ -23,14 +23,14 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   html {
-    --side: 84px;
-    --inner: 30px;
+    --side: clamp(10px, 3vw, 36px);
+    --inner: clamp(7px, 1.3vw, 14px);
     min-height: 100%;
     background-color: #80563f;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23d9601f'/%3E%3Crect x='0' y='0' width='20' height='20' fill='%23e07030' opacity='.3'/%3E%3Crect x='20' y='20' width='20' height='20' fill='%23e07030' opacity='.3'/%3E%3C/svg%3E");
     background-repeat: repeat;
   }
-  @media (max-width: 640px) { html { --side: 32px; --inner: 18px; } }
+  @media (max-width: 640px) { html { --side: 8px; --inner: 7px; } }
   body {
     color: var(--ink);
     font-family: var(--type);
@@ -66,13 +66,13 @@
   header p { margin: 0; font-size: 1.05rem; }
 
   /* MAIN LAYOUT */
-  .main-wrap { width: min(780px, 100%); display: flex; flex-direction: column; gap: 28px; }
+  .main-wrap { width: min(900px, 100%); display: flex; flex-direction: column; gap: 24px; }
 
   /* ── STEP 1: DROP ZONE ── */
-  .step { padding: 24px 28px; }
+  .step { width: 100%; padding: clamp(18px, 3vw, 28px); }
   .step-label {
     display: flex; align-items: center; gap: 10px;
-    font: 0.8rem var(--type); color: var(--stitch); text-transform: uppercase; letter-spacing: .08em;
+    font: .95rem/1.45 var(--type); color: var(--stitch); text-transform: uppercase; letter-spacing: .06em;
     margin: 0 0 14px;
   }
   .step-label span {
@@ -98,8 +98,8 @@
     position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
   }
   .dropzone svg { color: var(--brass); width: 48px; height: 48px; }
-  .dropzone p { margin: 0; font-size: 1rem; }
-  .dropzone small { color: #7a6040; font-size: .82rem; }
+  .dropzone p { margin: 0; font-size: 1rem; line-height: 1.5; }
+  .dropzone small { color: #7a6040; font-size: .9rem; line-height: 1.45; }
 
   /* two side-by-side card slots (front / back) */
   .card-sides { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
@@ -149,10 +149,18 @@
   .api-note code { background: #f3e8c8; padding: 1px 5px; border-radius: 3px; font-family: monospace; }
 
   /* ── STEP 3: FORM ── */
-  .recipe-form { display: none; flex-direction: column; gap: 20px; }
+  .recipe-form { display: none; flex-direction: column; gap: 22px; }
   .recipe-form.visible { display: flex; }
 
-  fieldset { border: 0; margin: 0; padding: 0; }
+  fieldset { min-width: 0; border: 0; margin: 0; padding: 0; }
+  .form-card {
+    padding: clamp(16px, 3vw, 24px);
+    border: 1px solid #d9d0c0;
+    border-radius: 8px;
+    background: var(--paper);
+    box-shadow: 0 3px 10px rgba(60, 40, 20, .08);
+  }
+  .section-help { margin: -2px 0 16px; color: #5d574e; font-size: 1rem; line-height: 1.55; }
   legend {
     font: 400 1.1rem/1 var(--display); color: var(--ink);
     padding: 0 0 10px; width: 100%;
@@ -160,11 +168,11 @@
   }
 
   .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; color: var(--wood-dark); }
+  .field label { font-size: .95rem; line-height: 1.4; text-transform: uppercase; letter-spacing: .04em; color: var(--wood-dark); }
   .field input, .field textarea, .field select {
     font: 1rem var(--type); color: var(--ink);
     background: var(--paper); border: 2px solid var(--brass);
-    border-radius: 6px; padding: 9px 12px;
+    min-height: 46px; border-radius: 6px; padding: 10px 12px;
     width: 100%; resize: vertical;
     transition: border-color .2s;
   }
@@ -209,23 +217,30 @@
   /* handwritten preview card */
   .card-preview {
     background: var(--paper); border-radius: 8px;
-    padding: 20px 24px;
+    min-width: 0; padding: clamp(16px, 3vw, 24px);
     box-shadow: inset 0 0 0 1px #e8d8b0, 0 3px 8px rgba(0,0,0,.1);
     font-family: var(--hand); font-size: 1.1rem; line-height: 1.6; color: var(--ink);
   }
   .card-preview h3 { font: 400 2rem/1 var(--hand); margin: 0 0 6px; color: var(--ink); }
-  .card-preview .card-meta { font-size: .95rem; color: #7a5020; margin-bottom: 12px; }
+  .card-preview .card-meta { font: .95rem/1.5 var(--type); color: var(--wood-dark); margin-bottom: 12px; }
+  .card-preview + .card-preview { margin-top: 14px; }
+  .grandma-preview { display: grid; grid-template-columns: minmax(72px, 120px) minmax(0, 1fr); gap: 18px; align-items: start; }
+  .grandma-preview-photo { display: grid; width: 100%; aspect-ratio: 1; place-items: center; overflow: hidden; border: 6px solid #f0e7d6; background: #bc906e; color: #fffdf7; font: 2.6rem var(--display); }
+  .grandma-preview-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .grandma-preview h3 { overflow-wrap: anywhere; }
+  .grandma-preview p { margin: 0; font: 1rem/1.55 var(--type); overflow-wrap: anywhere; }
+  .grandma-preview .preview-origin { margin-bottom: 8px; color: var(--wood-dark); font-weight: 600; }
 
   /* submit */
   .submit-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
   .submit-btn {
-    font: 1.05rem var(--type); color: #fff; background: var(--stitch);
+    min-height: 48px; font: 1.05rem var(--type); color: #fff; background: var(--wood-dark);
     border: 0; border-radius: 999px; padding: 13px 32px; cursor: pointer;
-    box-shadow: 0 3px 0 #7a2a0a;
+    box-shadow: 0 3px 0 #342d23;
   }
-  .submit-btn:hover { background: #d06020; }
-  .submit-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #7a2a0a; }
-  .submit-note { font-size: .85rem; color: #7a5020; }
+  .submit-btn:hover { background: #665a49; }
+  .submit-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #342d23; }
+  .submit-note { font-size: .95rem; line-height: 1.5; color: var(--wood-dark); }
 
   /* success */
   .success-msg {
@@ -241,7 +256,26 @@
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   @media screen {
     html { background-color: #80563f; background-image: radial-gradient(#fffdf71c 1px, transparent 1px); background-size: 16px 16px; }
-    body { border-image: none; border-color: #bc906e; }
+    body {
+      border-color: transparent;
+      border-image: none;
+      background:
+        radial-gradient(#fffdf71c 1px, transparent 1px) 0 0 / 16px 16px padding-box,
+        linear-gradient(#80563f, #80563f) padding-box,
+        repeating-conic-gradient(#bc906e 0% 25%, #d6b99b 0% 50%) 50% / 28px 28px border-box;
+    }
+  }
+  @media (max-width: 520px) {
+    .nav { gap: 4px; padding: 6px 8px; margin-bottom: 20px; }
+    .nav a { padding: 9px 10px; font-size: .95rem; }
+    header { margin-bottom: 22px; padding: 14px 16px; }
+    header p { font-size: 1rem; line-height: 1.5; }
+    .main-wrap { gap: 16px; }
+    .step { padding: 16px; }
+    .grandma-preview { grid-template-columns: 1fr; }
+    .grandma-preview-photo { width: min(120px, 40%); }
+    .submit-row { align-items: stretch; }
+    .submit-btn { width: 100%; }
   }
 </style>
 </head>
@@ -253,12 +287,12 @@
   <a href="map.html">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" style="vertical-align:-.15em;margin-right:5px"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Map
   </a>
-  <a href="submit.html" class="cta" aria-current="page">Add a recipe</a>
+  <a href="submit.html" class="cta" aria-current="page">Share your grandma</a>
 </nav>
 
 <header class="patch">
-  <h1>Add grandma's recipe</h1>
-  <p>Drop in a photo of her recipe card and we'll read it for you.</p>
+  <h1>Share a grandma &amp; her recipe</h1>
+  <p>Tell her story, then add one of the recipes she made special. Both cards will appear together.</p>
 </header>
 
 <div class="main-wrap">
@@ -340,53 +374,28 @@
 
   <!-- ── STEP 3 ── -->
   <div class="step patch" id="step3">
-    <p class="step-label"><span>3</span> Check, edit, and submit</p>
+    <p class="step-label"><span>3</span> Complete both cards and submit</p>
 
     <div class="recipe-form" id="recipeForm">
-      <fieldset>
-        <legend>About the recipe</legend>
+      <fieldset class="form-card grandma-form-card">
+        <legend>Grandma's about-me card</legend>
+        <p class="section-help">Share who she is. This becomes the first card on her recipe page.</p>
         <div class="field-row">
-          <div class="field">
-            <label for="fTitle">Recipe name *</label>
-            <input type="text" id="fTitle" name="title" required placeholder="e.g. Sunday Meatballs">
-          </div>
           <div class="field">
             <label for="fGrandma">Grandma's name *</label>
             <input type="text" id="fGrandma" name="grandma" required placeholder="e.g. Nana Rose">
           </div>
-        </div>
-        <div class="field-row" style="margin-top:14px;">
           <div class="field">
-            <label for="fBy">Submitted by *</label>
-            <input type="text" id="fBy" name="by" required placeholder="Your name">
-          </div>
-          <div class="field">
-            <label for="fTime">Cook time</label>
-            <input type="text" id="fTime" name="time" placeholder="e.g. 1 hr 30 min">
+            <label for="fFrom">Where is she from?</label>
+            <input type="text" id="fFrom" name="from" placeholder="e.g. Bensonhurst, Brooklyn">
           </div>
         </div>
         <div class="field" style="margin-top:14px;">
-          <label for="fBlurb">One-line description</label>
-          <input type="text" id="fBlurb" name="blurb" placeholder="What makes this dish special?">
+          <label for="fGrandmaDesc">Her story *</label>
+          <textarea id="fGrandmaDesc" name="grandmaDescription" required placeholder="What was she like? What made her cooking special? Share a favorite memory, tradition, or something you want people to know about her."></textarea>
         </div>
         <div class="field" style="margin-top:14px;">
-          <label for="fServings">Serves</label>
-          <input type="text" id="fServings" name="servings" placeholder="e.g. 4–6">
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>About grandma</legend>
-        <div class="field">
-          <label for="fFrom">Where is she from?</label>
-          <input type="text" id="fFrom" name="from" placeholder="e.g. Bensonhurst, Brooklyn">
-        </div>
-        <div class="field" style="margin-top:14px;">
-          <label for="fGrandmaDesc">Tell us about her</label>
-          <textarea id="fGrandmaDesc" name="grandmaDescription" placeholder="What was she like? What made her cooking special?"></textarea>
-        </div>
-        <div class="field" style="margin-top:14px;">
-          <label>A photo of grandma</label>
+          <label for="grandmaFileInput">A photo of grandma (optional)</label>
           <div class="dropzone" id="grandmaDrop" role="button" tabindex="0" aria-label="Upload a photo of grandma" style="min-height:140px;padding:26px 20px;">
             <input type="file" id="grandmaFileInput" accept="image/*" aria-label="Choose grandma photo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:36px;height:36px;">
@@ -404,7 +413,36 @@
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset class="form-card">
+        <legend>Recipe card</legend>
+        <p class="section-help">Now share one of her recipes to go with her story.</p>
+        <div class="field-row">
+          <div class="field">
+            <label for="fTitle">Recipe name *</label>
+            <input type="text" id="fTitle" name="title" required placeholder="e.g. Sunday Meatballs">
+          </div>
+          <div class="field">
+            <label for="fBy">Submitted by *</label>
+            <input type="text" id="fBy" name="by" required placeholder="Your name">
+          </div>
+        </div>
+        <div class="field-row" style="margin-top:14px;">
+          <div class="field">
+            <label for="fTime">Cook time</label>
+            <input type="text" id="fTime" name="time" placeholder="e.g. 1 hr 30 min">
+          </div>
+          <div class="field">
+            <label for="fServings">Serves</label>
+            <input type="text" id="fServings" name="servings" placeholder="e.g. 4–6">
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label for="fBlurb">One-line description</label>
+          <input type="text" id="fBlurb" name="blurb" placeholder="What makes this dish special?">
+        </div>
+      </fieldset>
+
+      <fieldset class="form-card">
         <legend>Ingredients</legend>
         <div class="ingredients-list" id="ingredientsList">
           <!-- rows injected by JS -->
@@ -412,7 +450,7 @@
         <button type="button" class="add-ingredient-btn" id="addIngredient">+ Add ingredient</button>
       </fieldset>
 
-      <fieldset>
+      <fieldset class="form-card">
         <legend>Method</legend>
         <div class="steps-list" id="stepsList">
           <!-- rows injected by JS -->
@@ -420,7 +458,7 @@
         <button type="button" class="add-ingredient-btn" id="addStep">+ Add step</button>
       </fieldset>
 
-      <fieldset>
+      <fieldset class="form-card">
         <legend>Notes &amp; tips</legend>
         <div class="field">
           <label for="fNotes">Grandma's notes</label>
@@ -429,8 +467,17 @@
       </fieldset>
 
       <!-- live handwritten preview -->
-      <fieldset>
-        <legend>Preview card</legend>
+      <fieldset class="form-card">
+        <legend>Preview both cards</legend>
+        <p class="section-help">These appear together on the finished recipe page.</p>
+        <div class="card-preview grandma-preview" id="grandmaCardPreview" aria-live="polite">
+          <div class="grandma-preview-photo" id="pvGrandmaPhoto"><span id="pvGrandmaInitial">?</span><img id="pvGrandmaImage" alt="" hidden></div>
+          <div>
+            <h3 id="pvGrandmaName">Grandma's name</h3>
+            <p class="preview-origin" id="pvGrandmaFrom"></p>
+            <p id="pvGrandmaStory">Her story will appear here.</p>
+          </div>
+        </div>
         <div class="card-preview" id="cardPreview" aria-live="polite">
           <h3 id="pvTitle">Recipe name</h3>
           <div class="card-meta" id="pvMeta"></div>
@@ -489,6 +536,7 @@ function initGrandmaPhoto() {
   const input   = $('grandmaFileInput');
   const wrap     = $('grandmaPreviewWrap');
   const img      = $('grandmaPreviewImg');
+  const cardImg  = $('pvGrandmaImage');
   const changeBt = $('grandmaChangeBtn');
   if (!drop) return;
 
@@ -505,6 +553,9 @@ function initGrandmaPhoto() {
     const reader = new FileReader();
     reader.onload = e => {
       img.src = e.target.result;
+      cardImg.src = e.target.result;
+      cardImg.hidden = false;
+      $('pvGrandmaInitial').hidden = true;
       drop.style.display = 'none';
       wrap.classList.add('visible');
     };
@@ -515,6 +566,9 @@ function initGrandmaPhoto() {
   changeBt.addEventListener('click', () => {
     grandmaFile = null;
     input.value = '';
+    cardImg.removeAttribute('src');
+    cardImg.hidden = true;
+    $('pvGrandmaInitial').hidden = false;
     wrap.classList.remove('visible');
     drop.style.display = '';
   });
@@ -772,19 +826,25 @@ $('addIngredient').addEventListener('click', () => addIngredientRow(''));
 $('addStep').addEventListener('click', () => addStepRow(''));
 
 // Live preview
-['fTitle','fGrandma','fBy','fTime','fServings','fBlurb','fNotes'].forEach(id => {
+['fTitle','fGrandma','fFrom','fGrandmaDesc','fBy','fTime','fServings','fBlurb','fNotes'].forEach(id => {
   $(id)?.addEventListener('input', updatePreview);
 });
 
 function updatePreview() {
   const title    = $('fTitle').value    || 'Recipe name';
   const grandma  = $('fGrandma').value;
+  const from     = $('fFrom').value;
+  const story    = $('fGrandmaDesc').value;
   const by       = $('fBy').value;
   const time     = $('fTime').value;
   const servings = $('fServings').value;
   const notes    = $('fNotes').value;
 
   $('pvTitle').textContent = title;
+  $('pvGrandmaName').textContent = grandma || "Grandma's name";
+  $('pvGrandmaInitial').textContent = grandma.trim().charAt(0).toUpperCase() || '?';
+  $('pvGrandmaFrom').textContent = from ? `From ${from}` : '';
+  $('pvGrandmaStory').textContent = story || 'Her story will appear here.';
   const metaParts = [];
   if (grandma) metaParts.push(`Grandma: ${grandma}`);
   if (by)      metaParts.push(`by ${by}`);
@@ -813,8 +873,13 @@ $('submitBtn').addEventListener('click', async () => {
   const title   = $('fTitle').value.trim();
   const grandma = $('fGrandma').value.trim();
   const by      = $('fBy').value.trim();
-  if (!title || !grandma || !by) {
-    alert('Please fill in at least the recipe name, grandma\'s name, and your name.');
+  const grandmaDescription = $('fGrandmaDesc').value.trim();
+  if (!title || !grandma || !by || !grandmaDescription) {
+    alert('Please fill in the recipe name, grandma\'s name, your name, and her story so both cards are complete.');
+    if (!grandmaDescription) $('fGrandmaDesc').focus();
+    else if (!grandma) $('fGrandma').focus();
+    else if (!title) $('fTitle').focus();
+    else $('fBy').focus();
     return;
   }
 
@@ -823,7 +888,7 @@ $('submitBtn').addEventListener('click', async () => {
   const payload = {
     title, grandma, by,
     from:               $('fFrom').value.trim(),
-    grandmaDescription: $('fGrandmaDesc').value.trim(),
+    grandmaDescription,
     time:     $('fTime').value.trim(),
     servings: $('fServings').value.trim(),
     blurb:    $('fBlurb').value.trim(),

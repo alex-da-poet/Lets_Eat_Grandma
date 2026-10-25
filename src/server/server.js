@@ -279,7 +279,7 @@ app.post('/api/recipes',
     catch { return res.status(400).json({ error: 'Invalid recipe data.' }); }
 
     // Validate the required fields (mirrors the front-end check).
-    const missing = ['title', 'grandma', 'by'].filter(k => !String(payload[k] ?? '').trim());
+    const missing = ['title', 'grandma', 'grandmaDescription', 'by'].filter(k => !String(payload[k] ?? '').trim());
     if (missing.length) {
       return res.status(422).json({ error: `Missing required field(s): ${missing.join(', ')}.` });
     }
