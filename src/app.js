@@ -1,24 +1,4 @@
 const page = document.body.dataset.page;
-const submissionStorageKey = "lets-eat-grandma.submissions";
-
-function readGrandmaSubmissions() {
-  const saved = localStorage.getItem(submissionStorageKey);
-  if (!saved) return [];
-  const submissions = JSON.parse(saved);
-  if (!Array.isArray(submissions) || !submissions.every((submission) =>
-    submission &&
-    typeof submission.name === "string" &&
-    typeof submission.origin === "string" &&
-    typeof submission.category === "string" &&
-    typeof submission.story === "string" &&
-    Number.isFinite(submission.latitude) &&
-    Number.isFinite(submission.longitude)
-  )) {
-    throw new Error("Saved grandma submissions have an invalid format.");
-  }
-  return submissions;
-}
-
 async function findPlaceCoordinates(place) {
   const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(place)}&limit=1`);
   if (!response.ok) throw new Error(`Place lookup failed with status ${response.status}.`);
@@ -75,102 +55,6 @@ if (page === "home") {
   });
 }
 
-if (page === "submit") {
-  const story = document.querySelector("#story");
-  story.addEventListener("input", () => {
-    document.querySelector("#story-count").textContent = String(story.value.length);
-  });
-
-  [["#portrait", "#portrait-preview"], ["#recipe-photo", "#recipe-preview"]].forEach(([inputSelector, previewSelector]) => {
-    const input = document.querySelector(inputSelector);
-    input.addEventListener("change", () => {
-      const file = input.files[0];
-      const preview = document.querySelector(previewSelector);
-      if (!file) {
-        preview.textContent = "Choose a photo";
-        return;
-      }
-      if (!["image/jpeg"].includes(file.type)) {
-        input.value = "";
-        preview.textContent = "Please choose a JPG or JPEG photo";
-        return;
-      }
-      const image = document.createElement("img");
-      image.src = URL.createObjectURL(file);
-      image.alt = `Preview of ${file.name}`;
-      preview.replaceChildren(image, document.createTextNode(file.name));
-    });
-  });
-
-  document.querySelector("#scale-recipe").addEventListener("click", () => {
-    const recipe = document.querySelector("#recipe-text").value.trim();
-    const result = document.querySelector("#scaled-result");
-    const factor = Number(document.querySelector("#scale-factor").value);
-    if (!recipe) {
-      result.hidden = false;
-      result.textContent = "Add a recipe above and I'll help scale the written amounts.";
-      return;
-    }
-    const scaled = recipe.replace(/\b(\d+\/\d+|\d+(?:\.\d+)?)\b/g, (amount, _number, offset) => {
-      if (/^\s*°?\s*[FC]\b/i.test(recipe.slice(offset + amount.length))) return amount;
-      const value = amount.includes("/") ? amount.split("/").reduce((n, d) => Number(n) / Number(d)) : Number(amount);
-      const adjusted = value * factor;
-      return Number.isInteger(adjusted) ? String(adjusted) : String(Number(adjusted.toFixed(2)));
-    });
-    result.hidden = false;
-    result.textContent = scaled;
-  });
-
-  document.querySelector("#grandma-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    if (!form.reportValidity()) return;
-    const submitButton = form.querySelector('button[type="submit"]');
-    const feedback = document.querySelector("#form-feedback");
-    feedback.hidden = false;
-    feedback.textContent = "Finding that place so we can add her to the map...";
-    submitButton.disabled = true;
-    try {
-      const fields = new FormData(form);
-      const name = fields.get("name").trim();
-      const origin = fields.get("origin").trim();
-      const coordinates = await findPlaceCoordinates(origin);
-      if (!coordinates) {
-        feedback.textContent = "We couldn't find that place. Try adding a town and country, then submit again.";
-        return;
-      }
-      const submissions = readGrandmaSubmissions();
-      submissions.push({
-        name,
-        origin,
-        category: fields.get("category"),
-        story: fields.get("story").trim(),
-        ...coordinates
-      });
-      localStorage.setItem(submissionStorageKey, JSON.stringify(submissions));
-      feedback.replaceChildren(
-        document.createTextNode(`What a lovely story about ${name}. She's on the map! `)
-      );
-      const mapLink = document.createElement("a");
-      mapLink.href = "map.html";
-      mapLink.textContent = "See her pin →";
-      feedback.append(mapLink);
-      form.reset();
-      document.querySelector("#story-count").textContent = "0";
-      document.querySelectorAll(".upload-preview").forEach((preview) => {
-        const addIcon = document.createElement("b");
-        addIcon.textContent = "＋";
-        preview.replaceChildren(document.createTextNode("Choose a photo "), addIcon);
-      });
-    } catch (error) {
-      console.error("Unable to save grandma submission.", error);
-      feedback.textContent = "We couldn't look up or save this submission. Please check your connection and browser storage, then try again.";
-    } finally {
-      submitButton.disabled = false;
-    }
-  });
-}
-
 if (page === "map") {
   const regions = {
     Italy: "From a sunlit Sicilian kitchen, where lemons, stories, and second helpings are always in season.",
@@ -180,51 +64,136 @@ if (page === "map") {
     India: "From Gujarat, where monsoon afternoons call for a warm cup of masala chai.",
     "South Korea": "From Seoul, where the family gathers to fold mandu and welcome the new year together."
   };
-  document.querySelectorAll(".map-pin").forEach((pin) => {
-    pin.addEventListener("click", () => {
-      document.querySelector(".map-pin.active")?.classList.remove("active");
-      pin.classList.add("active");
-      document.querySelector("#submitted-region-recipe").classList.add("hidden");
-      const region = pin.dataset.region;
-      document.querySelector("#region-title").textContent = region;
-      document.querySelector("#region-copy").textContent = regions[region];
-      document.querySelectorAll("[data-region-card]").forEach((card) => {
-        card.classList.toggle("hidden", card.dataset.regionCard !== region);
-      });
-      document.querySelector("#region-recipe").classList.toggle("hidden", region !== "Italy");
-    });
-  });
-
   const worldMap = document.querySelector(".world-map");
   const submittedRecipe = document.querySelector("#submitted-region-recipe");
   const mapMessage = document.querySelector("#map-submission-message");
-  try {
-    readGrandmaSubmissions().forEach((submission) => {
+
+  function selectRegion(pin) {
+    document.querySelector(".map-pin.active")?.classList.remove("active");
+    pin.classList.add("active");
+    submittedRecipe.classList.add("hidden");
+    const region = pin.dataset.region;
+    document.querySelector("#region-title").textContent = region;
+    document.querySelector("#region-copy").textContent = regions[region] || "";
+    document.querySelectorAll("[data-region-card]").forEach((card) => {
+      card.classList.toggle("hidden", card.dataset.regionCard !== region);
+    });
+    document.querySelector("#region-recipe").classList.toggle("hidden", region !== "Italy");
+  }
+
+  document.querySelectorAll(".map-pin").forEach((pin) => {
+    pin.addEventListener("click", () => {
+      selectRegion(pin);
+    });
+  });
+
+  function selectGrandma(pin, grandma, recipes) {
+    document.querySelector(".map-pin.active")?.classList.remove("active");
+    pin.classList.add("active");
+    document.querySelectorAll(".map-detail .region-recipe").forEach((card) => card.classList.add("hidden"));
+    document.querySelector("#region-title").textContent = grandma.from || grandma.name;
+    document.querySelector("#region-copy").textContent = grandma.description;
+    submittedRecipe.replaceChildren();
+    const name = document.createElement("strong");
+    name.textContent = grandma.name;
+    const detail = document.createElement("span");
+    detail.textContent = grandma.from || "Grandma's profile";
+    const content = document.createElement("div");
+    content.append(name, detail);
+    const profileLink = document.createElement("a");
+    profileLink.href = grandma.url;
+    profileLink.textContent = "View profile";
+    submittedRecipe.append(content, profileLink);
+    for (const recipe of recipes) {
+      const recipeLink = document.createElement("a");
+      recipeLink.href = recipe.url;
+      recipeLink.textContent = recipe.title || "View recipe";
+      submittedRecipe.append(recipeLink);
+    }
+    submittedRecipe.classList.remove("hidden");
+  }
+
+  async function loadSubmittedGrandmas() {
+    const [grandmaResponse, recipeResponse] = await Promise.all([
+      fetch("/api/grandmas"),
+      fetch("/api/recipes")
+    ]);
+    const [grandmaData, recipeData] = await Promise.all([
+      grandmaResponse.json(),
+      recipeResponse.json()
+    ]);
+    if (!grandmaResponse.ok) throw new Error(grandmaData.error || "Grandma profiles couldn't be loaded.");
+    if (!recipeResponse.ok) throw new Error(recipeData.error || "Recipe cards couldn't be loaded.");
+    if (!Array.isArray(grandmaData.grandmas) || !Array.isArray(recipeData.recipes)) {
+      throw new Error("The server returned invalid map data.");
+    }
+
+    const unplaced = [];
+    const occupiedPositions = new Map();
+    const placeCoordinateLookups = new Map();
+    for (const grandma of grandmaData.grandmas) {
+      let coordinates;
+      if (Number.isFinite(grandma.latitude) && Number.isFinite(grandma.longitude)) {
+        coordinates = { latitude: grandma.latitude, longitude: grandma.longitude };
+      } else if (grandma.from) {
+        const place = grandma.from.trim().toLowerCase();
+        if (!placeCoordinateLookups.has(place)) {
+          placeCoordinateLookups.set(place, findPlaceCoordinates(grandma.from));
+        }
+        try {
+          coordinates = await placeCoordinateLookups.get(place);
+        } catch {
+          unplaced.push(grandma);
+          continue;
+        }
+      }
+      if (!coordinates) {
+        unplaced.push(grandma);
+        continue;
+      }
+
+      const associatedRecipes = recipeData.recipes.filter((recipe) =>
+        recipe.grandmaId === grandma.id ||
+        (!recipe.grandmaId && recipe.grandma?.toLowerCase() === grandma.name.toLowerCase())
+      );
       const pin = document.createElement("button");
-      const x = Math.max(3, Math.min(97, ((submission.longitude + 180) / 360) * 100));
-      const y = Math.max(3, Math.min(97, ((90 - submission.latitude) / 180) * 100));
+      let x = Math.max(3, Math.min(97, ((coordinates.longitude + 180) / 360) * 100));
+      let y = Math.max(3, Math.min(97, ((90 - coordinates.latitude) / 180) * 100));
+      const positionKey = `${x.toFixed(1)},${y.toFixed(1)}`;
+      const overlap = occupiedPositions.get(positionKey) || 0;
+      const offsets = [[0, 0], [8, 0], [-8, 0], [0, 8], [0, -8]];
+      const [offsetX, offsetY] = offsets[overlap % offsets.length];
+      x = Math.max(3, Math.min(97, x + offsetX));
+      y = Math.max(3, Math.min(97, y + offsetY));
+      occupiedPositions.set(positionKey, overlap + 1);
       pin.type = "button";
       pin.className = "map-pin submitted-pin";
       pin.style.setProperty("--x", `${x}%`);
       pin.style.setProperty("--y", `${y}%`);
       pin.textContent = "✳";
-      pin.setAttribute("aria-label", `Explore ${submission.name} from ${submission.origin}`);
-      pin.title = `${submission.name} · ${submission.origin}`;
-      pin.addEventListener("click", () => {
-        document.querySelector(".map-pin.active")?.classList.remove("active");
-        pin.classList.add("active");
-        document.querySelectorAll(".map-detail .region-recipe").forEach((card) => card.classList.add("hidden"));
-        document.querySelector("#region-title").textContent = submission.origin;
-        document.querySelector("#region-copy").textContent = submission.story;
-        document.querySelector("#submitted-grandma-name").textContent = submission.name;
-        document.querySelector("#submitted-grandma-category").textContent = `${submission.category.replaceAll("-", " ")} family recipe`;
-        submittedRecipe.classList.remove("hidden");
-      });
+      pin.setAttribute("aria-label", `Explore ${grandma.name} from ${grandma.from}`);
+      pin.title = `${grandma.name} · ${grandma.from}`;
+      pin.addEventListener("click", () => selectGrandma(pin, grandma, associatedRecipes));
       worldMap.append(pin);
-    });
-  } catch (error) {
-    console.error("Unable to read saved grandma submissions.", error);
-    mapMessage.textContent = "Saved grandma pins couldn't be loaded from this browser.";
-    mapMessage.hidden = false;
+    }
+
+    if (unplaced.length) {
+      mapMessage.replaceChildren(document.createTextNode("Some Grandma profiles couldn't be placed on the map: "));
+      unplaced.forEach(({ name, url }, index) => {
+        if (index) mapMessage.append(document.createTextNode(", "));
+        const profileLink = document.createElement("a");
+        profileLink.href = url;
+        profileLink.textContent = name;
+        mapMessage.append(profileLink);
+      });
+      mapMessage.append(document.createTextNode(". Check the location and try again."));
+      mapMessage.hidden = false;
+    }
   }
+
+  loadSubmittedGrandmas().catch((error) => {
+    console.error("Unable to load submitted Grandma profiles for the map.", error);
+    mapMessage.textContent = error.message || "Grandma profiles couldn't be loaded from the server.";
+    mapMessage.hidden = false;
+  });
 }

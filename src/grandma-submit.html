@@ -51,13 +51,13 @@
 </nav>
 <header>
   <h1>Grandma's about-me card</h1>
-  <p>Tell us who she is. Her profile will be available when you add a recipe.</p>
+  <p>Tell us who she is. Her profile will appear on the map, and you can add her recipe card next.</p>
 </header>
 <form id="grandmaForm">
   <fieldset>
     <legend>About Grandma</legend>
     <div class="field"><label for="name">Grandma's name *</label><input id="name" name="name" required maxlength="120" placeholder="e.g. Nana Rose"></div>
-    <div class="field"><label for="from">Where is she from?</label><input id="from" name="from" maxlength="160" placeholder="e.g. Bensonhurst, Brooklyn"></div>
+    <div class="field"><label for="from">Where is she from? *</label><input id="from" name="from" required maxlength="160" placeholder="e.g. Bensonhurst, Brooklyn"></div>
     <div class="field"><label for="description">Her story *</label><textarea id="description" name="description" required maxlength="5000" placeholder="What was she like? What made her special? Share a favorite memory or family tradition."></textarea></div>
     <div class="field"><label for="photo">A photo of Grandma (optional)</label><div class="file-drop"><span>Choose a photo to include on her profile</span><input id="photo" name="grandmaPhoto" type="file" accept="image/*"></div><img class="preview" id="photoPreview" alt="Grandma photo preview"></div>
   </fieldset>
@@ -79,6 +79,17 @@ const status = document.getElementById('status');
 const submitButton = document.getElementById('submit');
 const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
 let photoFile = null;
+
+async function findPlaceCoordinates(place) {
+  const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(place)}&limit=1`);
+  if (!response.ok) throw new Error(`Location lookup failed with status ${response.status}.`);
+  const result = await response.json();
+  const coordinates = result.features?.[0]?.geometry?.coordinates;
+  if (!Array.isArray(coordinates) || !Number.isFinite(coordinates[0]) || !Number.isFinite(coordinates[1])) {
+    throw new Error("We couldn't find that place. Try adding a town and country.");
+  }
+  return { longitude: coordinates[0], latitude: coordinates[1] };
+}
 
 nameInput.addEventListener('input', () => {
   document.getElementById('previewName').textContent = nameInput.value.trim() || "Grandma's name";
@@ -114,13 +125,16 @@ form.addEventListener('submit', async event => {
   status.textContent = '';
   status.className = 'status';
   submitButton.disabled = true;
-  submitButton.textContent = 'Saving…';
+  submitButton.textContent = 'Finding her place…';
   try {
+    const coordinates = await findPlaceCoordinates(document.getElementById('from').value.trim());
+    submitButton.textContent = 'Saving…';
     const data = new FormData();
     data.append('data', JSON.stringify({
       name: nameInput.value.trim(),
       from: document.getElementById('from').value.trim(),
-      description: storyInput.value.trim()
+      description: storyInput.value.trim(),
+      ...coordinates
     }));
     if (photoFile) data.append('grandmaPhoto', photoFile);
     const response = await fetch(`${API_BASE}/api/grandmas`, { method:'POST', body:data });
@@ -140,7 +154,10 @@ form.addEventListener('submit', async event => {
     const recipeLink = document.createElement('a');
     recipeLink.href = `submit.html?grandma=${encodeURIComponent(result.grandma.slug)}`;
     recipeLink.textContent = 'Add one of her recipes';
-    confirmation.append(legend, thankYou, profileLink, document.createElement('br'), recipeLink);
+    const mapLink = document.createElement('a');
+    mapLink.href = 'map.html';
+    mapLink.textContent = 'See her on the map';
+    confirmation.append(legend, thankYou, profileLink, document.createElement('br'), mapLink, document.createElement('br'), recipeLink);
     form.replaceChildren(confirmation);
   } catch (error) {
     const message = window.location.protocol === 'file:' && error instanceof TypeError

@@ -9,10 +9,18 @@ recipes by region.
 
 Grandma profiles have their own submission page. Add a Grandma first, then
 select her profile when submitting a recipe so the recipe links to her story.
+Submitted profiles are saved on the server and appear as map pins; each pin
+links to the profile and any recipes associated with it.
 
 ## Run it locally
 
 Requires Node.js 18+.
+
+In VS Code, trust the workspace and allow automatic tasks when prompted. The
+local server starts automatically when this project folder opens. Then visit
+http://localhost:3000.
+
+To start it manually instead:
 
 ```bash
 cd src/server
@@ -21,7 +29,7 @@ npm install
 npm start
 ```
 
-Then open http://localhost:3000
+Install dependencies once with `npm install` before the first automatic start.
 
 ### Environment variables
 

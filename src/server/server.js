@@ -195,13 +195,26 @@ function renderGrandmaSection(r) {
     </section>`;
 }
 
-function buildGrandmaPage(template, grandma) {
+function renderGrandmaRecipes(recipes) {
+  if (!recipes.length) return '';
+  const list = recipes.map(recipe => `      <li>
+        <a href="${escapeHtml(recipe.url)}">${escapeHtml(recipe.title || 'Untitled recipe')}</a>
+        ${recipe.blurb ? `<p>${escapeHtml(recipe.blurb)}</p>` : ''}
+      </li>`).join('\n');
+  return `  <section class="sheet" aria-labelledby="recipes">
+    <span class="tab">From her kitchen</span>
+    <h2 id="recipes">Her recipe cards</h2>
+    <ul class="recipe-links">\n${list}\n    </ul>
+  </section>`;
+}
+
+function buildGrandmaPage(template, grandma, recipes) {
   const main = `  <main>\n${renderGrandmaSection({
     ...grandma,
     grandma: grandma.name,
     grandmaDescription: grandma.description,
     grandmaPhoto: grandma.photo
-  })}\n  </main>`;
+  })}\n${renderGrandmaRecipes(recipes)}\n  </main>`;
   return template
     .replace(/<main>[\s\S]*<\/main>/, main)
     .replace(/<title>[\s\S]*?<\/title>/, `<title>Meet ${escapeHtml(grandma.name)} · Let's eat grandma!</title>`)
@@ -248,8 +261,8 @@ app.get('/grandma-submit', (_req, res) => {
 app.get('/api/grandmas', async (_req, res) => {
   try {
     const grandmas = await readGrandmas();
-    res.json({ ok: true, grandmas: grandmas.map(({ id, name, slug, from, description, photo, url }) =>
-      ({ id, name, slug, from, description, photo, url })) });
+    res.json({ ok: true, grandmas: grandmas.map(({ id, name, slug, from, latitude, longitude, description, photo, url }) =>
+      ({ id, name, slug, from, latitude, longitude, description, photo, url })) });
   } catch (err) {
     console.error('load grandmas failed:', err);
     res.status(500).json({ error: 'Failed to load grandma profiles.' });
@@ -262,7 +275,11 @@ app.get('/grandmas/:slug', async (req, res) => {
     const grandma = grandmas.find(g => g.slug === req.params.slug);
     if (!grandma) return res.status(404).type('html').send('<h1>Grandma not found</h1><p><a href="/">Back to the recipe box</a></p>');
     const template = await fs.readFile(path.join(__dirname, '..', 'GrandmaExample.html'), 'utf8');
-    res.type('html').send(buildGrandmaPage(template, grandma));
+    const recipes = (await readStore()).filter(recipe =>
+      recipe.grandmaId === grandma.id ||
+      (!recipe.grandmaId && recipe.grandma?.toLowerCase() === grandma.name.toLowerCase())
+    );
+    res.type('html').send(buildGrandmaPage(template, grandma, recipes));
   } catch (err) {
     console.error('render grandma failed:', err);
     res.status(500).type('html').send('<h1>Could not load this grandma profile.</h1>');
@@ -283,6 +300,14 @@ app.post('/api/grandmas',
 
       const grandmas = await readGrandmas();
       const name = String(payload.name).trim();
+      const from = String(payload.from ?? '').trim();
+      const latitude = Number(payload.latitude);
+      const longitude = Number(payload.longitude);
+      if (!from) return res.status(422).json({ error: 'Where Grandma is from is required so her profile can appear on the map.' });
+      if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
+          !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+        return res.status(422).json({ error: 'A valid location is required so Grandma can be placed on the map.' });
+      }
       const baseSlug = slugify(name);
       let slug = baseSlug;
       let suffix = 2;
@@ -299,7 +324,9 @@ app.post('/api/grandmas',
       }
       const grandma = {
         id, slug, name,
-        from: String(payload.from ?? '').trim(),
+        from,
+        latitude,
+        longitude,
         description: String(payload.description).trim(),
         photo,
         submittedAt: new Date().toISOString(),
