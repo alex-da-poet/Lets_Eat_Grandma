@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#a66e4f">
+  <title>Grandma's Map — Let's eat grandma!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:wght@500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --map-paper: #fffdf7;
+      --map-paper-back: #f0e7d6;
+      --map-wood: #51483a;
+      --map-brass: #ad8a55;
+      --map-brass-dark: #735b37;
+      --map-ink: #29251f;
+      --map-stitch: #87583f;
+      --map-display: "Lora", Georgia, serif;
+      --map-hand: "Reenie Beanie", "Segoe Print", cursive;
+      --map-type: "DM Sans", Arial, sans-serif;
+    }
+    body.map-page {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: clamp(18px, 3vw, 34px) clamp(12px, 3vw, 28px) 40px;
+      border: 14px solid #c99a72;
+      background-color: #a66e4f;
+      background-image: radial-gradient(#fffdf71c 1px, transparent 1px);
+      background-size: 16px 16px;
+      color: var(--map-ink);
+      font-family: var(--map-type);
+    }
+    .map-page .patch {
+      border: 2px dashed var(--map-stitch);
+      border-radius: 10px;
+      outline: 4px solid var(--map-paper);
+      background: var(--map-paper);
+      box-shadow: 0 6px 16px rgba(60, 20, 0, .3);
+    }
+    .map-page .map-header {
+      margin: 0 auto 25px;
+      padding: 15px 26px;
+      text-align: center;
+    }
+    .map-page .map-header h1 {
+      margin: 0 0 7px;
+      color: var(--map-ink);
+      font: 400 clamp(2rem, 6vw, 3rem)/1.1 var(--map-display);
+    }
+    .map-page .map-header p {
+      margin: 0;
+      font-size: .95rem;
+    }
+    .map-page .map-main {
+      width: min(1120px, 100%);
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .map-page .map-intro {
+      max-width: 640px;
+      margin: 0 auto 25px;
+      padding: 15px 18px;
+      color: #fffdf7;
+      text-align: center;
+    }
+    .map-page .map-intro .eyebrow {
+      margin-bottom: 10px;
+      color: #f3dfc5;
+      font: .85rem var(--map-type);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .map-page .map-intro h2 {
+      margin: 0 0 12px;
+      color: #fffdf7;
+      font: 400 clamp(2rem, 6vw, 3.2rem)/1.05 var(--map-display);
+    }
+    .map-page .map-intro h2 em { color: #f3dfc5; }
+    .map-page .map-intro > p:last-child {
+      max-width: 530px;
+      margin: 0 auto;
+      color: #fffdf7;
+      font-size: .9rem;
+      line-height: 1.6;
+    }
+    .map-page .map-layout {
+      display: grid;
+      min-height: 410px;
+      grid-template-columns: minmax(0, 1.6fr) minmax(255px, .8fr);
+      overflow: hidden;
+      border: 10px solid var(--map-wood);
+      border-radius: 12px;
+      background: var(--map-wood);
+      box-shadow: 0 14px 24px #3b210f66, inset 0 0 0 2px #b87a43;
+    }
+    .map-page .world-map {
+      position: relative;
+      min-height: 410px;
+      overflow: hidden;
+      border: 7px solid #8a5a34;
+      background-color: var(--map-paper);
+      background-image: radial-gradient(#8a5a3420 .7px, transparent .7px);
+      background-size: 8px 8px;
+    }
+    .map-page .world-art,
+    .map-page .map-route {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .map-page .world-art path {
+      fill: #e7ddc6;
+      stroke: #8a7351;
+      stroke-width: 1.5;
+      stroke-linejoin: round;
+    }
+    .map-page .map-route path {
+      fill: none;
+      stroke: var(--map-stitch);
+      stroke-width: 2;
+      stroke-dasharray: 4 7;
+      opacity: .85;
+    }
+    .map-page .map-pin {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      z-index: 2;
+      width: 34px;
+      height: 34px;
+      transform: translate(-50%, -50%);
+      border: 2px solid var(--map-paper);
+      border-radius: 50%;
+      background: var(--map-brass);
+      color: #3b2a10;
+      font-size: 14px;
+      box-shadow: 0 2px 7px #29202155;
+      cursor: pointer;
+      transition: transform .2s, background .2s;
+    }
+    .map-page .map-pin:hover,
+    .map-page .map-pin.active {
+      transform: translate(-50%, -50%) scale(1.16);
+      background: var(--map-wood);
+      color: var(--map-paper);
+    }
+    .map-page .map-label {
+      position: absolute;
+      z-index: 1;
+      color: #625240;
+      font: .62rem var(--map-type);
+      letter-spacing: .12em;
+    }
+    .map-page .label-americas { left: 7%; top: 72%; }
+    .map-page .label-europe { left: 40%; top: 25%; }
+    .map-page .label-africa { left: 46%; top: 72%; }
+    .map-page .label-asia { left: 68%; top: 18%; }
+    .map-page .map-legend {
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      padding: 9px 11px;
+      border: 2px dashed var(--map-stitch);
+      border-radius: 7px;
+      outline: 3px solid var(--map-paper);
+      background: var(--map-paper);
+      color: var(--map-ink);
+      font-size: .7rem;
+    }
+    .map-page .map-legend > span { color: var(--map-brass-dark); }
+    .map-page .map-legend small { display: block; margin: 4px 0 0 14px; font-size: .6rem; }
+    .map-page .map-legend a { text-decoration: underline; }
+    .map-page .map-detail {
+      display: flex;
+      flex-direction: column;
+      padding: 28px 25px;
+      border: 2px dashed var(--map-stitch);
+      outline: 4px solid var(--map-paper);
+      background: var(--map-paper);
+      box-shadow: inset 0 0 0 7px #f3e8d1;
+    }
+    .map-page .map-detail .eyebrow {
+      margin-bottom: 9px;
+      color: var(--map-stitch);
+      font-size: .7rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .map-page .map-detail h2 {
+      margin: 0 0 12px;
+      color: var(--map-ink);
+      font: 400 2rem/1.1 var(--map-display);
+    }
+    .map-page .map-detail-copy {
+      min-height: 56px;
+      color: #564b3e;
+      font-size: .78rem;
+      line-height: 1.7;
+    }
+    .map-page .region-recipe {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px 0;
+      border-top: 1px dashed #cbbd9f;
+    }
+    .map-page .region-recipe.hidden { display: none; }
+    .map-page .region-flag { font-size: 22px; }
+    .map-page .region-recipe div { display: flex; flex: 1; flex-direction: column; gap: 4px; }
+    .map-page .region-recipe strong { color: var(--map-wood); font: 400 1.2rem var(--map-hand); }
+    .map-page .region-recipe div span { color: #50483e; font-size: .7rem; }
+    .map-page .region-recipe a { color: var(--map-brass-dark); font-size: 1rem; }
+    .map-page .map-share {
+      align-self: flex-start;
+      margin-top: auto;
+      border-color: var(--map-stitch);
+      color: var(--map-wood);
+      font-size: .72rem;
+    }
+    .map-page .map-storage-message { color: #693d2c; font-size: .72rem; line-height: 1.5; }
+    .map-page .map-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-top: 22px;
+      color: var(--map-paper);
+      font: 1.1rem var(--map-hand);
+    }
+    .map-page .map-bottom .button {
+      min-height: 0;
+      padding: 10px 14px;
+      border: 2px dashed var(--map-stitch);
+      border-radius: 8px;
+      outline: 3px solid var(--map-paper);
+      background: var(--map-paper);
+      color: var(--map-wood);
+      box-shadow: 0 4px 0 #7a3510;
+      font: .7rem var(--map-type);
+    }
+    .map-page .map-bottom .button span { padding-left: 6px; }
+    .map-page .site-footer {
+      width: min(1120px, 100%);
+      max-width: 1120px;
+      color: var(--map-paper);
+    }
+    .map-page .site-footer a { color: var(--map-paper); }
+    .map-page .site-footer .footer-brand { color: var(--map-paper); }
+    @media (max-width: 800px) {
+      body.map-page { border-width: 10px; }
+      .map-page .map-layout { grid-template-columns: 1fr; }
+      .map-page .world-map { min-height: 360px; }
+      .map-page .map-detail { min-height: 280px; padding: 24px; }
+      .map-page .map-detail-copy { min-height: 0; }
+    }
+    @media (max-width: 580px) {
+      body.map-page { padding: 14px 10px 24px; border-width: 8px; }
+      .map-page .map-header { margin-bottom: 20px; padding: 12px 15px; }
+      .map-page .map-intro h2 { font-size: 2rem; }
+      .map-page .map-layout { border-width: 6px; }
+      .map-page .world-map { min-height: 265px; border-width: 4px; }
+      .map-page .map-pin { width: 30px; height: 30px; }
+      .map-page .map-legend { bottom: 8px; left: 8px; padding: 6px 8px; font-size: .58rem; }
+      .map-page .map-legend small { font-size: .5rem; }
+      .map-page .map-detail { padding: 20px 17px; }
+      .map-page .map-bottom { font-size: 1rem; }
+      .map-page .map-bottom .button { padding: 8px; font-size: .58rem; }
+      .map-page .site-footer { gap: 10px; }
+    }
+  </style>
+  <link rel="stylesheet" href="theme.css">
+</head>
+<body class="map-page" data-page="map">
+  <details class="site-menu">
+    <summary aria-label="Site navigation menu"><span>Menu</span><span class="menu-icon" aria-hidden="true"></span></summary>
+    <nav class="menu-links" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a href="map.html" aria-current="page">Grandma's map</a>
+      <a href="submit.html">Share a grandma</a>
+    </nav>
+  </details>
+  <header class="site-masthead map-header">
+    <a class="masthead-brand" href="index.html">Let’s eat <strong>grandma!</strong></a>
+    <p>Our grandmas’ recipes, kept in one box.</p>
+  </header>
+  <main class="map-main">
+    <section class="map-intro"><p class="eyebrow">Pull up a chair, anywhere</p><h2>One big world.<br><em>So many kitchens.</em></h2><p>Every pin is a family story, simmering somewhere in the world. Pick one and see what's on the table.</p></section>
+    <section class="map-layout" aria-label="Explore recipes by region">
+      <div class="world-map" aria-label="Illustrated world map with recipe locations">
+        <svg class="world-art" viewBox="0 0 900 460" role="img" aria-label="Illustrated map showing regions around the world">
+          <path d="M86 92l46-28 51 9 36-21 44 13 28 29-14 21-32 4-18 25-31 9-9 27-25 9-14 40-23 6-7-38-20-16-6-36-23-17 4-36-18-21z"/>
+          <path d="M189 232l29 4 25 21 8 36-18 45-15 50-18 30-16-23 5-43-13-37 9-28-11-31z"/>
+          <path d="M372 102l42-20 49 9 21 22-12 25-38 2-13 25-38-1-14-20-24-7 3-22z"/>
+          <path d="M395 170l29-12 42 15 26 32-10 39-31 37-17 60-28 28-15-30 10-43-17-30 4-39-21-26z"/>
+          <path d="M467 99l53-30 82 5 51 22 70-2 42 26-13 24-52 8-27 24-44-8-24 29-35-12-30 11-20-24-40 6-15-26-34 2-29-21 8-20-31-14z"/>
+          <path d="M690 281l41-19 48 13 16 28-27 27-43 8-37-22z"/>
+          <path d="M273 102l14-8 13 6-4 15-17 2z"/><path d="M543 341l9 2 4 11-7 10-8-12z"/>
+        </svg>
+        <svg class="map-route" viewBox="0 0 900 460" aria-hidden="true"><path d="M168 157 Q280 72 415 160 T625 141 T755 185 M415 160 Q391 245 427 298 M415 160 Q516 113 571 148"/></svg>
+        <button class="map-pin active" style="--x:20%;--y:34%" data-region="Italy" aria-label="Explore Italy">✳</button>
+        <button class="map-pin" style="--x:23%;--y:51%" data-region="Puerto Rico" aria-label="Explore Puerto Rico">✳</button>
+        <button class="map-pin" style="--x:46%;--y:35%" data-region="Poland" aria-label="Explore Poland">✳</button>
+        <button class="map-pin" style="--x:49%;--y:57%" data-region="Ghana" aria-label="Explore Ghana">✳</button>
+        <button class="map-pin" style="--x:67%;--y:36%" data-region="India" aria-label="Explore India">✳</button>
+        <button class="map-pin" style="--x:77%;--y:33%" data-region="South Korea" aria-label="Explore South Korea">✳</button>
+        <span class="map-label label-americas">THE AMERICAS</span><span class="map-label label-europe">EUROPE</span><span class="map-label label-africa">AFRICA</span><span class="map-label label-asia">ASIA</span>
+        <div class="map-legend"><span>✳</span> Grandma's kitchen <small>Place lookup: Photon · © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a></small></div>
+      </div>
+      <aside class="map-detail" aria-live="polite">
+        <p class="eyebrow">A seat at the table in</p>
+        <h2 id="region-title">Italy</h2>
+        <p class="map-detail-copy" id="region-copy">From a sunlit Sicilian kitchen, where lemons, stories, and second helpings are always in season.</p>
+        <div class="region-recipe" id="region-recipe"><span class="region-flag">🇮🇹</span><div><strong>Nonna Lucia</strong><span>Lemon ricotta cake</span></div><a href="index.html#recipe-box" aria-label="See this recipe">↗</a></div>
+        <div class="region-recipe hidden" data-region-card="Puerto Rico"><span class="region-flag">🇵🇷</span><div><strong>Abuela Rosa</strong><span>Sunday sofrito rice</span></div><a href="index.html#recipe-box" aria-label="See this recipe">↗</a></div>
+        <div class="region-recipe hidden" data-region-card="Poland"><span class="region-flag">🇵🇱</span><div><strong>Bubbe Esther</strong><span>Friday chicken soup</span></div><a href="index.html#recipe-box" aria-label="See this recipe">↗</a></div>
+        <div class="region-recipe hidden" data-region-card="Ghana"><span class="region-flag">🇬🇭</span><div><strong>Coming soon</strong><span>A story from Ghana</span></div><a href="submit.html" aria-label="Share a recipe from Ghana">＋</a></div>
+        <div class="region-recipe hidden" data-region-card="India"><span class="region-flag">🇮🇳</span><div><strong>Nani Kavita</strong><span>Rainy-day masala chai</span></div><a href="index.html#recipe-box" aria-label="See this recipe">↗</a></div>
+        <div class="region-recipe hidden" data-region-card="South Korea"><span class="region-flag">🇰🇷</span><div><strong>Halmeoni Sun-hee</strong><span>New Year's mandu</span></div><a href="index.html#recipe-box" aria-label="See this recipe">↗</a></div>
+        <div class="region-recipe hidden" id="submitted-region-recipe"><span class="region-flag" aria-hidden="true">✳</span><div><strong id="submitted-grandma-name"></strong><span id="submitted-grandma-category"></span></div></div>
+        <p class="map-storage-message" id="map-submission-message" role="status" hidden></p>
+        <a class="text-link map-share" href="submit.html">Share a grandma to add her to the map <span aria-hidden="true">→</span></a>
+      </aside>
+    </section>
+    <section class="map-bottom"><span>From one family table to another.</span><a class="button button-outline" href="index.html#recipe-box">Browse all recipes <span aria-hidden="true">→</span></a></section>
+  </main>
+  <footer class="site-footer"><span>Made with love, and a little extra butter.</span></footer>
+  <script src="app.js"></script>
+</body>
+</html>

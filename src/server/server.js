@@ -35,6 +35,10 @@ import path from 'node:path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, '..')));
 
+app.get('/map', (_req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'map.html'));
+});
+
 // Serve uploaded photos (grandma photos, recipe-card images). These are saved
 // under server/data/uploads and referenced in pages as /data/uploads/<file>.
 app.use('/data', express.static(path.join(__dirname, 'data')));

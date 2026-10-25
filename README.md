@@ -4,6 +4,9 @@ A website for collecting grandmas' recipes. Upload a photo of a recipe card and
 an AI vision model (Google Gemini) reads it, normalizes vague measurements into
 universal units, and turns it into a shareable recipe page.
 
+Browse the family recipe box and explore the illustrated world map to discover
+recipes by region.
+
 ## Run it locally
 
 Requires Node.js 18+.
