@@ -628,7 +628,10 @@ async function loadGrandmas() {
       : 'No Grandma profiles yet. Create one first, then return to add the recipe.';
     updatePreview();
   } catch (error) {
-    status.textContent = `Could not load Grandma profiles: ${error.message || 'Please try again.'}`;
+    const detail = window.location.protocol === 'file:' && error instanceof TypeError
+      ? 'Start the app server, then open http://localhost:3000/submit.'
+      : error.message || 'Please try again.';
+    status.textContent = `Could not load Grandma profiles: ${detail}`;
     status.classList.add('error');
     select.replaceChildren(new Option('Grandma profiles unavailable', ''));
   }
@@ -671,7 +674,10 @@ scanBtn.addEventListener('click', async () => {
     announce('Recipe extracted and measurements converted. Please review the form below.');
 
   } catch (e) {
-    showScanError(e.message || 'Something went wrong. Please try again or fill in manually.');
+    const message = window.location.protocol === 'file:' && e instanceof TypeError
+      ? 'Could not reach the app server. Start it from src/server, then open http://localhost:3000/submit.'
+      : e.message || 'Something went wrong. Please try again or fill in manually.';
+    showScanError(message);
   }
 });
 
