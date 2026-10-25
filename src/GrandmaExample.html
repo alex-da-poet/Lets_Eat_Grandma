@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meet Grandma · Let's eat grandma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:wght@500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#fffdf7; --rule:#d9d0c0; --ink:#29251f; --wood-dark:#51483a; --stitch:#87583f; --display:"Lora",Georgia,serif; --hand:"Reenie Beanie","Segoe Print",cursive; --type:"DM Sans",Arial,sans-serif; }
+  * { box-sizing:border-box; }
+  html { min-height:100%; background:#80563f; }
+  body { width:min(900px,calc(100% - 32px)); margin:clamp(16px,4vw,48px) auto; padding:clamp(16px,4vw,40px); color:var(--ink); font-family:var(--type); background:var(--paper); border:8px solid #bc906e; box-shadow:0 8px 28px #39241466; }
+  .nav { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin:0 auto 28px; }
+  .nav a { padding:9px 16px; color:var(--ink); border-radius:999px; text-decoration:none; }
+  .nav a.cta { color:#fff; background:var(--wood-dark); }
+  main { display:grid; gap:24px; }
+  .sheet { position:relative; padding:clamp(18px,4vw,36px); background:#fffdf7; border:1px solid var(--rule); box-shadow:0 4px 14px #3024141c; }
+  .tab { display:inline-block; margin-bottom:18px; padding:5px 14px; background:#bc906e; color:#fff; font:1rem var(--type); }
+  .about { display:grid; grid-template-columns:210px minmax(0,1fr); gap:28px; align-items:start; }
+  .polaroid { margin:0; padding:10px 10px 16px; background:#fff; box-shadow:0 3px 10px #30241424; text-align:center; }
+  .photo { display:grid; width:100%; aspect-ratio:1; place-items:center; object-fit:cover; background:#bc906e; color:#fff; font:4rem var(--display); }
+  .name { margin-top:12px; font:1.8rem var(--hand); }
+  h2 { margin:0 0 16px; font:500 clamp(1.6rem,4vw,2.2rem)/1.2 var(--display); }
+  .facts { margin:0 0 14px; }
+  .facts dt { margin-top:8px; color:var(--stitch); font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+  .facts dd { margin:2px 0 0; }
+  .story { margin:0; font-size:1.05rem; line-height:1.75; }
+  @media(max-width:600px) { body { width:calc(100% - 16px); margin:8px auto; padding:14px; border-width:5px; } .about { grid-template-columns:1fr; gap:20px; } .polaroid { width:min(210px,100%); margin:auto; } }
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Main">
+  <a href="index.html">Home</a><a href="/recipes">Recipes</a><a href="/map">Map</a>
+  <a href="submit.html">Add a recipe</a><a class="cta" href="grandma-submit.html">Share a grandma</a>
+</nav>
+<main>
+  <section class="sheet" aria-labelledby="who">
+    <span class="tab">Grandma</span>
+    <div class="about">
+      <figure class="polaroid"><div class="photo" aria-hidden="true">?</div><figcaption class="name">Grandma</figcaption></figure>
+      <div><h2 id="who">Meet Grandma</h2><p class="story">Her story will appear here.</p></div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

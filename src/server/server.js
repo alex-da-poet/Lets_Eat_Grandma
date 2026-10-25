@@ -60,6 +60,7 @@ const upload = multer({
 ─────────────────────────────────────────────────────────────────────────── */
 const DATA_DIR = path.join(__dirname, 'data');
 const STORE_FILE = path.join(DATA_DIR, 'recipes.json');
+const GRANDMA_STORE_FILE = path.join(DATA_DIR, 'grandmas.json');
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 
 async function readStore() {
@@ -69,6 +70,35 @@ async function readStore() {
 async function writeStore(list) {
   await fs.mkdir(DATA_DIR, { recursive: true });
   await fs.writeFile(STORE_FILE, JSON.stringify(list, null, 2));
+}
+async function readGrandmas() {
+  let grandmas;
+  try { grandmas = JSON.parse(await fs.readFile(GRANDMA_STORE_FILE, 'utf8')); }
+  catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+    grandmas = [];
+  }
+  const existingNames = new Set(grandmas.map(grandma => grandma.name.toLowerCase()));
+  for (const recipe of await readStore()) {
+    const name = String(recipe.grandma ?? '').trim();
+    if (!name || existingNames.has(name.toLowerCase())) continue;
+    const slug = slugify(name);
+    grandmas.push({
+      id: `legacy-${slug}`,
+      slug,
+      name,
+      from: String(recipe.from ?? '').trim(),
+      description: String(recipe.grandmaDescription || recipe.blurb || `A treasured recipe from ${name}.`).trim(),
+      photo: recipe.grandmaPhoto || null,
+      url: `/grandmas/${slug}`
+    });
+    existingNames.add(name.toLowerCase());
+  }
+  return grandmas;
+}
+async function writeGrandmas(list) {
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.writeFile(GRANDMA_STORE_FILE, JSON.stringify(list, null, 2));
 }
 function slugify(s) {
   return String(s).toLowerCase().trim()
@@ -107,6 +137,9 @@ function renderRecipeArticle(r) {
   const blurb = r.blurb ? `<p class="meta"><span>${escapeHtml(r.blurb)}</span></p>` : '';
   const notes = r.notes
     ? `\n      <p class="note">Grandma's note: ${escapeHtml(r.notes)}</p>` : '';
+  const grandmaLink = r.grandmaSlug
+    ? `<a href="/grandmas/${escapeHtml(r.grandmaSlug)}">Meet ${escapeHtml(r.grandma)}</a> · `
+    : '';
 
   return `    <article class="sheet recipe" aria-labelledby="title">
       <span class="tab">Recipe</span>
@@ -126,40 +159,55 @@ ${ingredients || '            <li><label><input type="checkbox"><span></span></l
       <ol class="steps">
 ${steps || '        <li></li>'}
       </ol>${notes}
-      <p class="by">Sent in by ${escapeHtml(r.by)} <a href="/submit">Add your grandma's recipe</a></p>
+      <p class="by">Sent in by ${escapeHtml(r.by)} ${grandmaLink}<a href="/submit">Add a recipe</a></p>
     </article>`;
 }
 
 /** Build the "Meet grandma" intro section that replaces the example one. */
 function renderGrandmaSection(r) {
+  const name = r.grandma || r.name || '';
+  const description = r.grandmaDescription || r.description || '';
   // Photo spot: show the uploaded grandma photo if there is one, otherwise fall
   // back to her initial (matching the template's default styling).
   const photo = r.grandmaPhoto
-    ? `<img class="photo" src="${escapeHtml(r.grandmaPhoto)}" alt="${escapeHtml(r.grandma)}" style="width:190px;height:190px;object-fit:cover;">`
-    : `<div class="photo" aria-hidden="true">${escapeHtml((r.grandma || '?').trim().charAt(0).toUpperCase())}</div>`;
+    ? `<img class="photo" src="${escapeHtml(r.grandmaPhoto)}" alt="${escapeHtml(name)}" style="width:190px;height:190px;object-fit:cover;">`
+    : `<div class="photo" aria-hidden="true">${escapeHtml((name || '?').trim().charAt(0).toUpperCase())}</div>`;
 
   // "From" fact row — only shown when provided.
   const fromRow = r.from
     ? `\n          <dl class="facts"><dt>From</dt><dd>${escapeHtml(r.from)}</dd></dl>` : '';
 
   // Description of grandma; fall back to the recipe blurb, then a default line.
-  const story = escapeHtml(
-    r.grandmaDescription || r.blurb || `A treasured recipe from ${r.grandma}.`
-  );
+  const story = escapeHtml(description || r.blurb || `A treasured recipe from ${name}.`);
 
   return `    <section class="sheet" aria-labelledby="who">
-      <span class="tab">${escapeHtml(r.grandma)}</span>
+      <span class="tab">${escapeHtml(name)}</span>
       <div class="about">
         <figure class="polaroid" style="margin:0">
           ${photo}
-          <figcaption class="name">${escapeHtml(r.grandma)}</figcaption>
+          <figcaption class="name">${escapeHtml(name)}</figcaption>
         </figure>
         <div>
-          <h2 id="who">Meet ${escapeHtml(r.grandma)}</h2>${fromRow}
+          <h2 id="who">Meet ${escapeHtml(name)}</h2>${fromRow}
           <p class="story">${story}</p>
         </div>
       </div>
     </section>`;
+}
+
+function buildGrandmaPage(template, grandma) {
+  const main = `  <main>\n${renderGrandmaSection({
+    ...grandma,
+    grandma: grandma.name,
+    grandmaDescription: grandma.description,
+    grandmaPhoto: grandma.photo
+  })}\n  </main>`;
+  return template
+    .replace(/<main>[\s\S]*<\/main>/, main)
+    .replace(/<title>[\s\S]*?<\/title>/, `<title>Meet ${escapeHtml(grandma.name)} · Let's eat grandma</title>`)
+    .replace(/href="index\.html"/g, 'href="/"')
+    .replace(/href="submit\.html"/g, 'href="/submit"')
+    .replace(/href="grandma-submit\.html"/g, 'href="/grandma-submit"');
 }
 
 /**
@@ -178,7 +226,8 @@ function buildRecipePage(template, r) {
   // Make them absolute so Home and Add-a-recipe work from any URL depth.
   html = html
     .replace(/href="index\.html"/g, 'href="/"')
-    .replace(/href="submit\.html"/g, 'href="/submit"');
+    .replace(/href="submit\.html"/g, 'href="/submit"')
+    .replace(/href="grandma-submit\.html"/g, 'href="/grandma-submit"');
   return html;
 }
 
@@ -192,6 +241,80 @@ app.get('/submit', (_req, res) => {
   res.sendFile(path.join(__dirname, '..', 'submit.html'));
 });
 
+app.get('/grandma-submit', (_req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'grandma-submit.html'));
+});
+
+app.get('/api/grandmas', async (_req, res) => {
+  try {
+    const grandmas = await readGrandmas();
+    res.json({ ok: true, grandmas: grandmas.map(({ id, name, slug, from, description, photo, url }) =>
+      ({ id, name, slug, from, description, photo, url })) });
+  } catch (err) {
+    console.error('load grandmas failed:', err);
+    res.status(500).json({ error: 'Failed to load grandma profiles.' });
+  }
+});
+
+app.get('/grandmas/:slug', async (req, res) => {
+  try {
+    const grandmas = await readGrandmas();
+    const grandma = grandmas.find(g => g.slug === req.params.slug);
+    if (!grandma) return res.status(404).type('html').send('<h1>Grandma not found</h1><p><a href="/">Back to the recipe box</a></p>');
+    const template = await fs.readFile(path.join(__dirname, '..', 'GrandmaExample.html'), 'utf8');
+    res.type('html').send(buildGrandmaPage(template, grandma));
+  } catch (err) {
+    console.error('render grandma failed:', err);
+    res.status(500).type('html').send('<h1>Could not load this grandma profile.</h1>');
+  }
+});
+
+app.post('/api/grandmas',
+  upload.single('grandmaPhoto'),
+  async (req, res) => {
+    try {
+      let payload;
+      try { payload = JSON.parse(req.body?.data ?? '{}'); }
+      catch { return res.status(400).json({ error: 'Invalid grandma profile data.' }); }
+      const missing = ['name', 'description'].filter(key => !String(payload[key] ?? '').trim());
+      if (missing.length) {
+        return res.status(422).json({ error: `Missing required field(s): ${missing.join(', ')}.` });
+      }
+
+      const grandmas = await readGrandmas();
+      const name = String(payload.name).trim();
+      const baseSlug = slugify(name);
+      let slug = baseSlug;
+      let suffix = 2;
+      while (grandmas.some(grandma => grandma.slug === slug)) slug = `${baseSlug}-${suffix++}`;
+
+      const id = crypto.randomUUID();
+      let photo = null;
+      if (req.file) {
+        await fs.mkdir(UPLOAD_DIR, { recursive: true });
+        const ext = (req.file.mimetype.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+        const fileName = `${id}-grandma.${ext}`;
+        await fs.writeFile(path.join(UPLOAD_DIR, fileName), req.file.buffer);
+        photo = `/data/uploads/${fileName}`;
+      }
+      const grandma = {
+        id, slug, name,
+        from: String(payload.from ?? '').trim(),
+        description: String(payload.description).trim(),
+        photo,
+        submittedAt: new Date().toISOString(),
+        url: `/grandmas/${slug}`
+      };
+      grandmas.push(grandma);
+      await writeGrandmas(grandmas);
+      res.status(201).json({ ok: true, grandma });
+    } catch (err) {
+      console.error('save grandma failed:', err);
+      res.status(500).json({ error: err.message || 'Failed to save grandma profile.' });
+    }
+  }
+);
+
 app.get('/recipes/:slug', async (req, res) => {
   try {
     const store = await readStore();
@@ -201,7 +324,18 @@ app.get('/recipes/:slug', async (req, res) => {
       return res.status(404).type('html').send('<h1>Recipe not found</h1><p><a href="/">Back to the box</a></p>');
     }
     const template = await fs.readFile(TEMPLATE_FILE, 'utf8');
-    res.type('html').send(buildRecipePage(template, recipe));
+    let grandma = recipe;
+    if (recipe.grandmaId) {
+      grandma = (await readGrandmas()).find(item => item.id === recipe.grandmaId) || recipe;
+    }
+    res.type('html').send(buildRecipePage(template, {
+      ...recipe,
+      grandmaSlug: grandma.slug,
+      grandma: grandma.name ?? recipe.grandma,
+      from: grandma.from ?? recipe.from,
+      grandmaDescription: grandma.description ?? recipe.grandmaDescription,
+      grandmaPhoto: grandma.photo ?? recipe.grandmaPhoto
+    }));
   } catch (err) {
     console.error('render recipe failed:', err);
     res.status(500).type('html').send('<h1>Could not load this recipe.</h1>');
@@ -262,15 +396,11 @@ app.post('/api/read-recipe',
   }
 });
 
-/* Save a reviewed recipe (JSON in the `data` field) + optional photos.
-   Two optional image fields:
-     - image        : the original recipe-card photo
-     - grandmaPhoto : a photo of grandma, shown in the recipe page's photo spot */
+/* Save a reviewed recipe (JSON in the `data` field) + optional card photos. */
 app.post('/api/recipes',
   upload.fields([
     { name: 'image', maxCount: 1 },
-    { name: 'imageBack', maxCount: 1 },
-    { name: 'grandmaPhoto', maxCount: 1 }
+    { name: 'imageBack', maxCount: 1 }
   ]),
   async (req, res) => {
   try {
@@ -279,10 +409,13 @@ app.post('/api/recipes',
     catch { return res.status(400).json({ error: 'Invalid recipe data.' }); }
 
     // Validate the required fields (mirrors the front-end check).
-    const missing = ['title', 'grandma', 'grandmaDescription', 'by'].filter(k => !String(payload[k] ?? '').trim());
+    const missing = ['title', 'grandmaId', 'by'].filter(k => !String(payload[k] ?? '').trim());
     if (missing.length) {
       return res.status(422).json({ error: `Missing required field(s): ${missing.join(', ')}.` });
     }
+
+    const grandma = (await readGrandmas()).find(item => item.id === payload.grandmaId);
+    if (!grandma) return res.status(422).json({ error: 'Choose a valid Grandma profile before submitting the recipe.' });
 
     const id = crypto.randomUUID();
     const slug = slugify(payload.title);
@@ -306,7 +439,6 @@ app.post('/api/recipes',
 
     const imagePath        = await saveImage(req.files?.image?.[0], '');
     const imageBackPath    = await saveImage(req.files?.imageBack?.[0], '-back');
-    const grandmaPhotoPath = await saveImage(req.files?.grandmaPhoto?.[0], '-grandma');
 
     const record = {
       id,
@@ -316,11 +448,10 @@ app.post('/api/recipes',
       url: `/recipes/${slug}`,
       image: imagePath,
       imageBack: imageBackPath,
-      grandmaPhoto: grandmaPhotoPath,
       title:    String(payload.title).trim(),
-      grandma:  String(payload.grandma).trim(),
-      from:     String(payload.from ?? '').trim(),
-      grandmaDescription: String(payload.grandmaDescription ?? '').trim(),
+      grandmaId: grandma.id,
+      grandma: grandma.name,
+      grandmaSlug: grandma.slug,
       by:       String(payload.by).trim(),
       time:     String(payload.time ?? '').trim(),
       servings: String(payload.servings ?? '').trim(),

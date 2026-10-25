@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Share a grandma · Let's eat grandma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:wght@500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#fffdf7; --rule:#d9d0c0; --ink:#29251f; --wood-dark:#51483a; --brass:#ad8a55; --stitch:#87583f; --display:"Lora",Georgia,serif; --hand:"Reenie Beanie","Segoe Print",cursive; --type:"DM Sans",Arial,sans-serif; }
+  * { box-sizing:border-box; }
+  html { min-height:100%; background:#80563f; }
+  body { width:min(900px,calc(100% - 32px)); margin:clamp(16px,4vw,48px) auto; padding:clamp(16px,4vw,40px); color:var(--ink); font-family:var(--type); background:var(--paper); border:8px solid #bc906e; box-shadow:0 8px 28px #39241466; }
+  .nav { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin:0 auto 28px; }
+  .nav a { padding:9px 16px; color:var(--ink); border-radius:999px; text-decoration:none; }
+  .nav a.cta { color:#fff; background:var(--wood-dark); }
+  header { margin:0 0 24px; text-align:center; }
+  h1 { margin:0 0 8px; font:500 clamp(1.8rem,6vw,2.8rem)/1.15 var(--display); }
+  header p { margin:0; line-height:1.55; }
+  form { display:grid; gap:20px; }
+  fieldset { min-width:0; margin:0; padding:clamp(16px,3vw,24px); border:1px solid var(--rule); border-radius:8px; box-shadow:0 3px 10px #3c281414; }
+  legend { padding:0 10px; font:500 1.25rem var(--display); }
+  .field { display:grid; gap:7px; margin-top:14px; }
+  .field:first-of-type { margin-top:0; }
+  label { color:var(--wood-dark); font-size:.95rem; font-weight:600; }
+  input,textarea { width:100%; min-height:46px; padding:10px 12px; border:2px solid var(--brass); border-radius:6px; background:var(--paper); color:var(--ink); font:1rem var(--type); }
+  textarea { min-height:150px; resize:vertical; line-height:1.55; }
+  input:focus,textarea:focus { outline:2px solid var(--stitch); outline-offset:1px; }
+  .file-drop { display:grid; place-items:center; min-height:120px; gap:8px; padding:18px; border:2px dashed var(--brass); border-radius:10px; background:#fffbf0; text-align:center; }
+  .file-drop input { border:0; padding:0; min-height:0; }
+  .preview { display:none; max-width:min(100%,240px); max-height:240px; margin:12px auto 0; object-fit:cover; border:6px solid #f0e7d6; }
+  .preview.visible { display:block; }
+  .actions { display:flex; justify-content:center; }
+  button { min-height:48px; padding:12px 28px; border:0; border-radius:999px; background:var(--wood-dark); color:#fff; font:600 1rem var(--type); cursor:pointer; box-shadow:0 3px 0 #342d23; }
+  button:disabled { opacity:.65; cursor:wait; }
+  .status { min-height:1.5em; text-align:center; line-height:1.5; }
+  .status.error { color:#a93226; }
+  .status a { color:var(--stitch); }
+  .card-preview { display:grid; grid-template-columns:minmax(100px,160px) minmax(0,1fr); gap:20px; align-items:start; padding:18px; background:var(--paper); border:1px solid var(--rule); box-shadow:0 3px 10px #30241418; }
+  .card-preview img { width:100%; aspect-ratio:1; object-fit:cover; background:#bc906e; }
+  .card-preview h2 { margin:0 0 8px; font:2rem var(--hand); overflow-wrap:anywhere; }
+  .card-preview p { margin:0; line-height:1.6; overflow-wrap:anywhere; }
+  @media(max-width:560px) { body { width:calc(100% - 16px); margin:8px auto; padding:14px; border-width:5px; } .card-preview { grid-template-columns:1fr; } .card-preview img { width:min(140px,100%); } }
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Main">
+  <a href="index.html">Home</a><a href="recipes.html">Recipes</a><a href="map.html">Map</a>
+  <a href="submit.html">Add a recipe</a><a class="cta" href="grandma-submit.html" aria-current="page">Share a grandma</a>
+</nav>
+<header>
+  <h1>Grandma's about-me card</h1>
+  <p>Tell us who she is. Her profile will be available when you add a recipe.</p>
+</header>
+<form id="grandmaForm">
+  <fieldset>
+    <legend>About Grandma</legend>
+    <div class="field"><label for="name">Grandma's name *</label><input id="name" name="name" required maxlength="120" placeholder="e.g. Nana Rose"></div>
+    <div class="field"><label for="from">Where is she from?</label><input id="from" name="from" maxlength="160" placeholder="e.g. Bensonhurst, Brooklyn"></div>
+    <div class="field"><label for="description">Her story *</label><textarea id="description" name="description" required maxlength="5000" placeholder="What was she like? What made her special? Share a favorite memory or family tradition."></textarea></div>
+    <div class="field"><label for="photo">A photo of Grandma (optional)</label><div class="file-drop"><span>Choose a photo to include on her profile</span><input id="photo" name="grandmaPhoto" type="file" accept="image/*"></div><img class="preview" id="photoPreview" alt="Grandma photo preview"></div>
+  </fieldset>
+  <fieldset>
+    <legend>Profile preview</legend>
+    <div class="card-preview"><img id="avatar" alt="" hidden><div><h2 id="previewName">Grandma's name</h2><p id="previewStory">Her story will appear here.</p></div></div>
+  </fieldset>
+  <div class="actions"><button id="submit" type="submit">Share her story</button></div>
+  <p class="status" id="status" aria-live="polite"></p>
+</form>
+<script>
+const form = document.getElementById('grandmaForm');
+const nameInput = document.getElementById('name');
+const storyInput = document.getElementById('description');
+const photoInput = document.getElementById('photo');
+const photoPreview = document.getElementById('photoPreview');
+const avatar = document.getElementById('avatar');
+const status = document.getElementById('status');
+const submitButton = document.getElementById('submit');
+let photoFile = null;
+
+nameInput.addEventListener('input', () => {
+  document.getElementById('previewName').textContent = nameInput.value.trim() || "Grandma's name";
+});
+storyInput.addEventListener('input', () => {
+  document.getElementById('previewStory').textContent = storyInput.value.trim() || 'Her story will appear here.';
+});
+photoInput.addEventListener('change', () => {
+  photoFile = photoInput.files[0] || null;
+  if (!photoFile) return;
+  if (!photoFile.type.startsWith('image/')) {
+    status.textContent = 'Please choose an image file.';
+    status.className = 'status error';
+    photoInput.value = '';
+    photoFile = null;
+    return;
+  }
+  if (photoFile.size > 10 * 1024 * 1024) {
+    status.textContent = 'Photo is too large. Please choose one under 10 MB.';
+    status.className = 'status error';
+    photoInput.value = '';
+    photoFile = null;
+    return;
+  }
+  const imageUrl = URL.createObjectURL(photoFile);
+  photoPreview.src = imageUrl;
+  photoPreview.classList.add('visible');
+  avatar.src = imageUrl;
+  avatar.hidden = false;
+});
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+  status.textContent = '';
+  status.className = 'status';
+  submitButton.disabled = true;
+  submitButton.textContent = 'Saving…';
+  try {
+    const data = new FormData();
+    data.append('data', JSON.stringify({
+      name: nameInput.value.trim(),
+      from: document.getElementById('from').value.trim(),
+      description: storyInput.value.trim()
+    }));
+    if (photoFile) data.append('grandmaPhoto', photoFile);
+    const response = await fetch('/api/grandmas', { method:'POST', body:data });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || `Server error ${response.status}`);
+    const confirmation = document.createElement('fieldset');
+    const legend = document.createElement('legend');
+    legend.textContent = "Grandma's profile is ready";
+    const thankYou = document.createElement('p');
+    thankYou.className = 'status';
+    thankYou.textContent = 'Thank you for sharing her story.';
+    const profileLink = document.createElement('a');
+    profileLink.href = result.grandma.url;
+    profileLink.textContent = `View ${result.grandma.name}'s profile`;
+    const recipeLink = document.createElement('a');
+    recipeLink.href = `submit.html?grandma=${encodeURIComponent(result.grandma.slug)}`;
+    recipeLink.textContent = 'Add one of her recipes';
+    confirmation.append(legend, thankYou, profileLink, document.createElement('br'), recipeLink);
+    form.replaceChildren(confirmation);
+  } catch (error) {
+    status.textContent = `${error.message || 'Could not save her profile.'} Please try again.`;
+    status.className = 'status error';
+    submitButton.disabled = false;
+    submitButton.textContent = 'Share her story';
+  }
+});
+</script>
+</body>
+</html>

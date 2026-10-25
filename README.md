@@ -7,6 +7,9 @@ universal units, and turns it into a shareable recipe page.
 Browse the family recipe box and explore the illustrated world map to discover
 recipes by region.
 
+Grandma profiles have their own submission page. Add a Grandma first, then
+select her profile when submitting a recipe so the recipe links to her story.
+
 ## Run it locally
 
 Requires Node.js 18+.

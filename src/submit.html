@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Share a grandma &amp; her recipe · Let's eat grandma</title>
+<title>Add a recipe · Let's eat grandma</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:wght@500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
@@ -241,6 +241,7 @@
   .submit-btn:hover { background: #665a49; }
   .submit-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #342d23; }
   .submit-note { font-size: .95rem; line-height: 1.5; color: var(--wood-dark); }
+  #grandmaLoadStatus.error { color: #a93226; }
 
   /* success */
   .success-msg {
@@ -287,12 +288,13 @@
   <a href="map.html">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" style="vertical-align:-.15em;margin-right:5px"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Map
   </a>
-  <a href="submit.html" class="cta" aria-current="page">Share your grandma</a>
+  <a href="submit.html" class="cta" aria-current="page">Add a recipe</a>
+  <a href="grandma-submit.html">Share a grandma</a>
 </nav>
 
 <header class="patch">
-  <h1>Share a grandma &amp; her recipe</h1>
-  <p>Tell her story, then add one of the recipes she made special. Both cards will appear together.</p>
+  <h1>Add a recipe</h1>
+  <p>Choose a Grandma profile, then share one of her recipes.</p>
 </header>
 
 <div class="main-wrap">
@@ -374,48 +376,19 @@
 
   <!-- ── STEP 3 ── -->
   <div class="step patch" id="step3">
-    <p class="step-label"><span>3</span> Complete both cards and submit</p>
+    <p class="step-label"><span>3</span> Complete the recipe card and submit</p>
 
     <div class="recipe-form" id="recipeForm">
-      <fieldset class="form-card grandma-form-card">
-        <legend>Grandma's about-me card</legend>
-        <p class="section-help">Share who she is. This becomes the first card on her recipe page.</p>
-        <div class="field-row">
-          <div class="field">
-            <label for="fGrandma">Grandma's name *</label>
-            <input type="text" id="fGrandma" name="grandma" required placeholder="e.g. Nana Rose">
-          </div>
-          <div class="field">
-            <label for="fFrom">Where is she from?</label>
-            <input type="text" id="fFrom" name="from" placeholder="e.g. Bensonhurst, Brooklyn">
-          </div>
-        </div>
-        <div class="field" style="margin-top:14px;">
-          <label for="fGrandmaDesc">Her story *</label>
-          <textarea id="fGrandmaDesc" name="grandmaDescription" required placeholder="What was she like? What made her cooking special? Share a favorite memory, tradition, or something you want people to know about her."></textarea>
-        </div>
-        <div class="field" style="margin-top:14px;">
-          <label for="grandmaFileInput">A photo of grandma (optional)</label>
-          <div class="dropzone" id="grandmaDrop" role="button" tabindex="0" aria-label="Upload a photo of grandma" style="min-height:140px;padding:26px 20px;">
-            <input type="file" id="grandmaFileInput" accept="image/*" aria-label="Choose grandma photo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:36px;height:36px;">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <path d="M21 15l-5-5L5 21"/>
-            </svg>
-            <p style="font-size:.95rem;">Drop a photo here, or <strong>click to browse</strong></p>
-            <small>This appears in the photo spot on the recipe page.</small>
-          </div>
-          <div class="preview-wrap" id="grandmaPreviewWrap" style="margin-top:12px;">
-            <img id="grandmaPreviewImg" class="preview-img" src="" alt="Grandma preview" style="max-height:200px;">
-            <button class="change-btn" id="grandmaChangeBtn" type="button">⟳ Choose a different photo</button>
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset class="form-card">
+      <fieldset class="form-card" id="recipe-card">
         <legend>Recipe card</legend>
-        <p class="section-help">Now share one of her recipes to go with her story.</p>
+        <p class="section-help">Choose an existing Grandma profile so her story appears with this recipe.</p>
+        <div class="field">
+          <label for="fGrandma">Grandma *</label>
+          <select id="fGrandma" name="grandmaId" required>
+            <option value="">Loading Grandma profiles…</option>
+          </select>
+          <p class="submit-note" id="grandmaLoadStatus" aria-live="polite">Loading saved Grandma profiles…</p>
+        </div>
         <div class="field-row">
           <div class="field">
             <label for="fTitle">Recipe name *</label>
@@ -468,16 +441,7 @@
 
       <!-- live handwritten preview -->
       <fieldset class="form-card">
-        <legend>Preview both cards</legend>
-        <p class="section-help">These appear together on the finished recipe page.</p>
-        <div class="card-preview grandma-preview" id="grandmaCardPreview" aria-live="polite">
-          <div class="grandma-preview-photo" id="pvGrandmaPhoto"><span id="pvGrandmaInitial">?</span><img id="pvGrandmaImage" alt="" hidden></div>
-          <div>
-            <h3 id="pvGrandmaName">Grandma's name</h3>
-            <p class="preview-origin" id="pvGrandmaFrom"></p>
-            <p id="pvGrandmaStory">Her story will appear here.</p>
-          </div>
-        </div>
+        <legend>Recipe preview</legend>
         <div class="card-preview" id="cardPreview" aria-live="polite">
           <h3 id="pvTitle">Recipe name</h3>
           <div class="card-meta" id="pvMeta"></div>
@@ -495,7 +459,7 @@
 
     <!-- empty state before scan or skip -->
     <div id="step3Empty" style="color:#9a7050;font-size:.95rem;">
-      Complete step 2 (or skip it) to see the form here.
+      Complete step 2 (or skip it) to see the recipe form here.
     </div>
 
     <!-- success -->
@@ -526,65 +490,6 @@ let uploadedFile = null;       // front of the recipe card
 let uploadedDataURL = null;
 let backFile = null;           // optional back of the recipe card
 let backDataURL = null;
-let grandmaFile = null;        // optional photo of grandma for the recipe page
-
-/* ──────────────────────────────────────────────
-   Grandma photo picker (in the "About grandma" section)
-────────────────────────────────────────────── */
-function initGrandmaPhoto() {
-  const drop    = $('grandmaDrop');
-  const input   = $('grandmaFileInput');
-  const wrap     = $('grandmaPreviewWrap');
-  const img      = $('grandmaPreviewImg');
-  const cardImg  = $('pvGrandmaImage');
-  const changeBt = $('grandmaChangeBtn');
-  if (!drop) return;
-
-  function load(file) {
-    if (!file || !file.type.startsWith('image/')) {
-      alert('Please choose an image file for grandma\'s photo.');
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      alert('Image is too large. Please use one under 10 MB.');
-      return;
-    }
-    grandmaFile = file;
-    const reader = new FileReader();
-    reader.onload = e => {
-      img.src = e.target.result;
-      cardImg.src = e.target.result;
-      cardImg.hidden = false;
-      $('pvGrandmaInitial').hidden = true;
-      drop.style.display = 'none';
-      wrap.classList.add('visible');
-    };
-    reader.readAsDataURL(file);
-  }
-
-  input.addEventListener('change', e => load(e.target.files[0]));
-  changeBt.addEventListener('click', () => {
-    grandmaFile = null;
-    input.value = '';
-    cardImg.removeAttribute('src');
-    cardImg.hidden = true;
-    $('pvGrandmaInitial').hidden = false;
-    wrap.classList.remove('visible');
-    drop.style.display = '';
-  });
-  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
-  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-  drop.addEventListener('drop', e => {
-    e.preventDefault(); drop.classList.remove('over');
-    const file = e.dataTransfer.files[0];
-    if (file) load(file);
-  });
-  drop.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
-  });
-}
-initGrandmaPhoto();
-
 /* ──────────────────────────────────────────────
    STEP 1 – file upload / drop zone
 ────────────────────────────────────────────── */
@@ -690,7 +595,46 @@ dropzoneBack.addEventListener('keydown', e => {
    The server reads the image AND normalizes vague
    measures, returning dual metric/US amounts.
 ────────────────────────────────────────────── */
-const API_BASE = ''; // same origin; set to 'http://localhost:3000' if served separately
+const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
+let grandmas = [];
+let extractedGrandmaName = '';
+
+async function loadGrandmas() {
+  const select = $('fGrandma');
+  const status = $('grandmaLoadStatus');
+  try {
+    const response = await fetch(`${API_BASE}/api/grandmas`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || `Server error ${response.status}`);
+    if (!Array.isArray(result.grandmas)) throw new Error('The server returned an invalid Grandma profile list.');
+    grandmas = result.grandmas;
+    select.replaceChildren(new Option('Choose a Grandma…', ''));
+    for (const grandma of grandmas) {
+      const location = grandma.from ? ` — ${grandma.from}` : '';
+      select.add(new Option(`${grandma.name}${location}`, grandma.id));
+    }
+    const requestedGrandma = new URLSearchParams(window.location.search).get('grandma');
+    const requestedMatch = grandmas.find(grandma =>
+      grandma.id === requestedGrandma || grandma.slug === requestedGrandma
+    );
+    if (requestedMatch) {
+      select.value = requestedMatch.id;
+    } else if (extractedGrandmaName) {
+      const match = grandmas.find(grandma => grandma.name.toLowerCase() === extractedGrandmaName.toLowerCase());
+      if (match) select.value = match.id;
+    }
+    status.textContent = grandmas.length
+      ? 'Select a profile to pair it with this recipe.'
+      : 'No Grandma profiles yet. Create one first, then return to add the recipe.';
+    updatePreview();
+  } catch (error) {
+    status.textContent = `Could not load Grandma profiles: ${error.message || 'Please try again.'}`;
+    status.classList.add('error');
+    select.replaceChildren(new Option('Grandma profiles unavailable', ''));
+  }
+}
+
+loadGrandmas();
 
 scanBtn.addEventListener('click', async () => {
   if (!uploadedFile && !uploadedDataURL) {
@@ -758,7 +702,12 @@ function showForm() {
 
 function populateForm(r) {
   $('fTitle').value    = r.title    ?? '';
-  $('fGrandma').value  = r.grandma  ?? '';
+  extractedGrandmaName = r.grandma ?? '';
+  if (r.grandmaId) $('fGrandma').value = r.grandmaId;
+  else if (extractedGrandmaName) {
+    const match = grandmas.find(grandma => grandma.name.toLowerCase() === extractedGrandmaName.toLowerCase());
+    if (match) $('fGrandma').value = match.id;
+  }
   $('fTime').value     = r.time     ?? '';
   $('fServings').value = r.servings ?? '';
   $('fBlurb').value    = r.blurb    ?? '';
@@ -826,27 +775,22 @@ $('addIngredient').addEventListener('click', () => addIngredientRow(''));
 $('addStep').addEventListener('click', () => addStepRow(''));
 
 // Live preview
-['fTitle','fGrandma','fFrom','fGrandmaDesc','fBy','fTime','fServings','fBlurb','fNotes'].forEach(id => {
+['fTitle','fBy','fTime','fServings','fBlurb','fNotes'].forEach(id => {
   $(id)?.addEventListener('input', updatePreview);
 });
+$('fGrandma').addEventListener('change', updatePreview);
 
 function updatePreview() {
   const title    = $('fTitle').value    || 'Recipe name';
-  const grandma  = $('fGrandma').value;
-  const from     = $('fFrom').value;
-  const story    = $('fGrandmaDesc').value;
+  const grandma  = $('fGrandma').selectedOptions[0]?.textContent.trim();
   const by       = $('fBy').value;
   const time     = $('fTime').value;
   const servings = $('fServings').value;
   const notes    = $('fNotes').value;
 
   $('pvTitle').textContent = title;
-  $('pvGrandmaName').textContent = grandma || "Grandma's name";
-  $('pvGrandmaInitial').textContent = grandma.trim().charAt(0).toUpperCase() || '?';
-  $('pvGrandmaFrom').textContent = from ? `From ${from}` : '';
-  $('pvGrandmaStory').textContent = story || 'Her story will appear here.';
   const metaParts = [];
-  if (grandma) metaParts.push(`Grandma: ${grandma}`);
+  if (grandma && $('fGrandma').value) metaParts.push(`Grandma: ${grandma}`);
   if (by)      metaParts.push(`by ${by}`);
   if (time)    metaParts.push(time);
   if (servings)metaParts.push(`Serves ${servings}`);
@@ -871,13 +815,11 @@ function updatePreview() {
 $('submitBtn').addEventListener('click', async () => {
   // Basic validation
   const title   = $('fTitle').value.trim();
-  const grandma = $('fGrandma').value.trim();
+  const grandmaId = $('fGrandma').value;
   const by      = $('fBy').value.trim();
-  const grandmaDescription = $('fGrandmaDesc').value.trim();
-  if (!title || !grandma || !by || !grandmaDescription) {
-    alert('Please fill in the recipe name, grandma\'s name, your name, and her story so both cards are complete.');
-    if (!grandmaDescription) $('fGrandmaDesc').focus();
-    else if (!grandma) $('fGrandma').focus();
+  if (!title || !grandmaId || !by) {
+    alert('Please choose a Grandma profile and fill in the recipe name and your name.');
+    if (!grandmaId) $('fGrandma').focus();
     else if (!title) $('fTitle').focus();
     else $('fBy').focus();
     return;
@@ -886,9 +828,7 @@ $('submitBtn').addEventListener('click', async () => {
   // Collect data — ingredients/steps read straight from the (AI-prefilled,
   // user-editable) fields, so whatever the cook confirms is what gets saved.
   const payload = {
-    title, grandma, by,
-    from:               $('fFrom').value.trim(),
-    grandmaDescription,
+    title, grandmaId, by,
     time:     $('fTime').value.trim(),
     servings: $('fServings').value.trim(),
     blurb:    $('fBlurb').value.trim(),
@@ -910,8 +850,6 @@ $('submitBtn').addEventListener('click', async () => {
     formData.append('data', JSON.stringify(payload));
     if (uploadedFile) formData.append('image', uploadedFile);
     if (backFile) formData.append('imageBack', backFile);
-    if (grandmaFile) formData.append('grandmaPhoto', grandmaFile);
-
     const resp = await fetch(`${API_BASE}/api/recipes`, { method: 'POST', body: formData });
     const result = await resp.json().catch(() => ({}));
     if (!resp.ok) throw new Error(result?.error || `Server error ${resp.status}`);

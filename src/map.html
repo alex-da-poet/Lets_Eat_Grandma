@@ -48,6 +48,24 @@
       background: var(--map-paper);
       box-shadow: 0 6px 16px rgba(60, 20, 0, .3);
     }
+    .map-page .map-nav {
+      display: flex;
+      width: max-content;
+      max-width: 100%;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin: 0 auto 28px;
+      padding: 8px 12px;
+    }
+    .map-page .map-nav a {
+      padding: 9px 13px;
+      border-radius: 999px;
+      color: var(--map-ink);
+      text-decoration: none;
+    }
+    .map-page .map-nav a:hover,
+    .map-page .map-nav a[aria-current="page"] { text-decoration: underline 2px var(--map-stitch); text-underline-offset: 4px; }
     .map-page .map-header {
       margin: 0 auto 25px;
       padding: 15px 26px;
@@ -284,14 +302,13 @@
   <link rel="stylesheet" href="theme.css">
 </head>
 <body class="map-page" data-page="map">
-  <details class="site-menu">
-    <summary aria-label="Site navigation menu"><span>Menu</span><span class="menu-icon" aria-hidden="true"></span></summary>
-    <nav class="menu-links" aria-label="Main navigation">
+  <nav class="map-nav patch" aria-label="Main navigation">
       <a href="index.html">Home</a>
+      <a href="recipes.html">Recipes</a>
       <a href="map.html" aria-current="page">Grandma's map</a>
-      <a href="submit.html">Share a grandma</a>
-    </nav>
-  </details>
+      <a href="submit.html">Add a recipe</a>
+      <a href="grandma-submit.html">Share a grandma</a>
+  </nav>
   <header class="site-masthead map-header">
     <a class="masthead-brand" href="index.html">Let’s eat <strong>grandma!</strong></a>
     <p>Our grandmas’ recipes, kept in one box.</p>
@@ -326,12 +343,12 @@
         <div class="region-recipe" id="region-recipe"><span class="region-flag">🇮🇹</span><div><strong>Nonna Lucia</strong><span>Lemon ricotta cake</span></div><a href="index.html#recipe-box" aria-label="See this recipe">↗</a></div>
         <div class="region-recipe hidden" data-region-card="Puerto Rico"><span class="region-flag">🇵🇷</span><div><strong>Abuela Rosa</strong><span>Sunday sofrito rice</span></div><a href="index.html#recipe-box" aria-label="See this recipe">↗</a></div>
         <div class="region-recipe hidden" data-region-card="Poland"><span class="region-flag">🇵🇱</span><div><strong>Bubbe Esther</strong><span>Friday chicken soup</span></div><a href="index.html#recipe-box" aria-label="See this recipe">↗</a></div>
-        <div class="region-recipe hidden" data-region-card="Ghana"><span class="region-flag">🇬🇭</span><div><strong>Coming soon</strong><span>A story from Ghana</span></div><a href="submit.html" aria-label="Share a recipe from Ghana">＋</a></div>
+        <div class="region-recipe hidden" data-region-card="Ghana"><span class="region-flag">🇬🇭</span><div><strong>Coming soon</strong><span>A story from Ghana</span></div><a href="grandma-submit.html" aria-label="Share a grandma from Ghana">＋</a></div>
         <div class="region-recipe hidden" data-region-card="India"><span class="region-flag">🇮🇳</span><div><strong>Nani Kavita</strong><span>Rainy-day masala chai</span></div><a href="index.html#recipe-box" aria-label="See this recipe">↗</a></div>
         <div class="region-recipe hidden" data-region-card="South Korea"><span class="region-flag">🇰🇷</span><div><strong>Halmeoni Sun-hee</strong><span>New Year's mandu</span></div><a href="index.html#recipe-box" aria-label="See this recipe">↗</a></div>
         <div class="region-recipe hidden" id="submitted-region-recipe"><span class="region-flag" aria-hidden="true">✳</span><div><strong id="submitted-grandma-name"></strong><span id="submitted-grandma-category"></span></div></div>
         <p class="map-storage-message" id="map-submission-message" role="status" hidden></p>
-        <a class="text-link map-share" href="submit.html">Share a grandma and her recipe <span aria-hidden="true">→</span></a>
+        <a class="text-link map-share" href="grandma-submit.html">Share a grandma <span aria-hidden="true">→</span></a>
       </aside>
     </section>
     <section class="map-bottom"><span>From one family table to another.</span><a class="button button-outline" href="index.html#recipe-box">Browse all recipes <span aria-hidden="true">→</span></a></section>
